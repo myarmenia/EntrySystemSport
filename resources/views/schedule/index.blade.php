@@ -57,14 +57,13 @@
                             <!-- Bordered Table -->
                             @if (count($data)==0)
                                 <div class="alert alert-danger" role="alert">
-                                    <p>Դուք չունեք ստեղծած հերթափոխեր</p>
+                                    @if ($user->hasAnyRole(['client_admin', 'client_admin_rfID', 'manager']))
+                                        <p>Դուք չունեք ստեղծած հերթափոխեր</p>
+                                    @elseif ($user->hasAnyRole(['client_sport', 'trainer']))
+                                        <p>Դուք չունեք ստեղծած ժամային գրաֆիկ</p>
+                                    @endif
                                 </div>
-
-
                             @else
-
-
-
                             <table class="table table-bordered">
                                 <thead>
                                 <tr>

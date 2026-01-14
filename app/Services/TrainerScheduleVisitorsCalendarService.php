@@ -10,9 +10,9 @@ use Illuminate\Support\Facades\Hash;
 class TrainerScheduleVisitorsCalendarService
 {
     public function __construct(protected TrainerScheduleVisitorsCalendarRepository $trainerScheduleVisitor){}
-    public function getTrainerScheduleVisitors($schedule_id)
+    public function getTrainerScheduleVisitors(int $schedule_id)
     {
 
-        return $this->trainerScheduleVisitor->getTrainerVisitors();
+        return $this->trainerScheduleVisitor->getTrainerVisitors( $schedule_id);
     }
 }
