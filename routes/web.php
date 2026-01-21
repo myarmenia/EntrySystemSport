@@ -18,6 +18,7 @@ use App\Http\Controllers\EntryCode\EntryCodeUpdateController;
 use App\Http\Controllers\ExpertPersonDayScheduleController;
 use App\Http\Controllers\GetCalendarDataController;
 use App\Http\Controllers\GetDayReservationsController;
+use App\Http\Controllers\GetTrainerScheduleVisitorsController;
 use App\Http\Controllers\People\PeopleController;
 use App\Http\Controllers\People\PeoplelistController;
 use App\Http\Controllers\PersonPermission\PersonPermissionController;
@@ -77,9 +78,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/calendar/{id}', CalendarController::class)->name('calendar');
     Route::get('calendar-data/{id}', GetCalendarDataController::class);
     Route::get('get-day-reservations/{person}/{date}', GetDayReservationsController::class);
-    // ===== TrainerScheduleVisitorsCalendar ===================
+    // ====== TrainerScheduleVisitorsCalendar ===================
     Route::get('schedule-calendar/{schedule_id}',TrainerScheduleVisitorsCalendarController::class)->name('schedule-calendar');
-
+    Route::get('get-trainer-schedule-visitors',GetTrainerScheduleVisitorsController::class);
 
     // ========People==========================
     //Route::resource('people', PeopleController::class);

@@ -1,3 +1,6 @@
 .env
 /vendor
-/storage
+/node_modules
+storage/app/
+storage/framework/
+storage/logs/
