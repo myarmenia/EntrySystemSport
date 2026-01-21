@@ -48,11 +48,12 @@ function calendar() {
     const segments = path.split('/');
 
     // Получаем нужный сегмент, в данном случае "2"
-    const person_id = segments[segments.length - 1];
+    const schedule_id = segments[segments.length - 1];
 
     var reserved_date = $(this).attr('data-date')
+    console.log(reserved_date,444)
     $.ajax({
-      url: `/get-trainer-schedule-visitors/${person_id}/` + reserved_date,
+      url: `/get-trainer-schedule-visitors/${schedule_id}/` + reserved_date,
       processData: false,
       contentType: false,
       type: 'get',
@@ -71,67 +72,7 @@ function calendar() {
   // ========================== E N D ===========================================================
 
 
-  // =========== store or update educational program reservetion ==================================
-  $('body').on('submit', '.reserve', function (e) {
-
-    e.preventDefault()
-    var $that = $(this)
-    var formData = new FormData($(this)[0]);
-    var educational_program_type = 'educational_program'
-    var educational_program_id = $(this).find(".educational_program_id").val()
-    var method = $(this).attr('method')
-    var url = ''
-
-    if (educational_program_id == 'null_id') {
-      educational_program_type = 'excursion'
-
-    }
-
-    if (method == 'post') {
-      url = '/educational-programs/reserve-store'
-    }
-    else {
-      var reserve_id = $(this).attr('data-id')
-      url = '/educational-programs/reserve-update/' + reserve_id
-    }
-
-    formData.append("type", educational_program_type)
-    console.log(educational_program_id)
-    $('.error').html('')
-
-    $.ajax({
-      url: url,
-      data: formData,
-      processData: false,
-      contentType: false,
-      type: 'post',
-      beforeSend: function (x) {
-        console.log('befor sebd')
-      },
-      success: function (data) {
-        if (method == 'post') {
-          $that.find('.item').val('')
-
-        }
-        console.log(555555)
-        $that.find('.result_message').html(`<span class=" text-success">Գործողությունը կատարված է</span>`)
-        calendar()
-        setTimeout(function () {
-          $('.result_message').html('');
-        }, 2000);
-      },
-      error: function (data) {
-        var errors = data.responseJSON.errors;
-
-        $.each(errors, function (field_name, error) {
-          $that.find('[name=' + field_name + ']').after('<span class="error text-strong text-danger">' + error + '</span>')
-        })
-
-      }
-    });
-  })
-  // ==================== E N D =======================================================
-
+ 
 
 
 

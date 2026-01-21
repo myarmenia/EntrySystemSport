@@ -80,7 +80,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('get-day-reservations/{person}/{date}', GetDayReservationsController::class);
     // ====== TrainerScheduleVisitorsCalendar ===================
     Route::get('schedule-calendar/{schedule_id}',TrainerScheduleVisitorsCalendarController::class)->name('schedule-calendar');
-    Route::get('get-trainer-schedule-visitors',GetTrainerScheduleVisitorsController::class);
+    Route::get('get-trainer-schedule-visitors/{schedule}/{date}',GetTrainerScheduleVisitorsController::class);
 
     // ========People==========================
     //Route::resource('people', PeopleController::class);

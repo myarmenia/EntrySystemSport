@@ -49,6 +49,7 @@
 
     <div class="your-component">
         {{-- $reservetions   գալիս է js-ից --}}
+        {{-- {{ dd($reservetions) }} --}}
 
         <x-schedule :reservetions=" isset($reservetions) ? $reservetions : [] " ></x-schedule>
     </div>
