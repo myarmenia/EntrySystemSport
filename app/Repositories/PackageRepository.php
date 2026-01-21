@@ -67,7 +67,6 @@ class PackageRepository implements PackageRepositoryInterface
         }
 
         $packages = $query->get();
-
         // ✅ հաշվարկ (DB query չի անում)
         foreach ($packages as $p) {
             $discount = $p->discounts->first();

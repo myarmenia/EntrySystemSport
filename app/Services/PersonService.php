@@ -127,14 +127,13 @@ class PersonService
     //}
     public function getTrainersList()
     {
-        // current client_admin-ի client id
         $clientId = Client::where('user_id', Auth::id())->value('id');
 
         $trainerRole = Role::where('name', 'trainer')->firstOrFail();
 
         $trainerUsers = $trainerRole->users()
             ->where('model_has_roles.model_type', User::class)
-            ->whereNull('users.deleted_at') // soft delete filter
+            ->whereNull('users.deleted_at')
             ->when($clientId, function ($q) use ($clientId) {
                 $q->whereIn('users.id', function ($sub) use ($clientId) {
                     $sub->select('user_id')
@@ -142,11 +141,31 @@ class PersonService
                         ->where('client_admin_id', $clientId);
                 });
             })
-            // ✅ bring trainer schedules (հերթափոխերը)
-            ->with(['scheduleNames' => function ($q) {
-                $q->select('schedule_names.id', 'schedule_names.name'); // միայն պետքական դաշտերը
-            }])
-            ->select('users.id', 'users.name') // ցանկության դեպքում ավելացրու այլ դաշտեր
+            ->with([
+                'scheduleNames' => function ($q) {
+                    $q->select('schedule_names.id', 'schedule_names.name')
+                        ->with([
+                            'schedule_details' => function ($sd) {
+                                $sd->select(
+                                    'id',
+                                    'schedule_name_id',   // ⚠️ պետք է լինի relation-ի համար
+                                    'week_day',
+                                    'day_start_time',
+                                    'day_end_time',
+                                    'break_start_time',
+                                    'break_end_time'
+                                )
+                                    ->whereNull('deleted_at');
+                                // եթե պետք է հերթականություն՝ կարող ես ավելացնել orderBy
+                            }
+                        ]);
+                },
+                'sessionDurations' => function ($q) {
+                    $q->select('session_durations.id', 'session_durations.minutes', 'session_durations.title', 'session_durations.price_amd')
+                        ->wherePivot('is_active', true);
+                },
+            ])
+            ->select('users.id', 'users.name')
             ->orderBy('users.name')
             ->get();
 

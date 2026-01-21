@@ -12,7 +12,7 @@ class ScheduleDetailsController extends Controller
 {
     public function __construct(protected ScheduleDetailsService $service){}
     public function update(ScheduleDetailsRequest $request,$id){
-        // dd($request->all());
+        //dd($request->all());
 
         // $data=$this->service->update(ScheduleDetailsDto::fromRequestDto($request),$id);
         $data = $this->service->update(($request->all()),$id);
