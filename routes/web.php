@@ -85,6 +85,8 @@ Route::group(['middleware' => ['auth']], function () {
     // ========People==========================
     //Route::resource('people', PeopleController::class);
     Route::put('/people/{person}', [PeopleController::class, 'update'])->name('people.update');
+    Route::get('/trainers/{trainer}/schedules/{scheduleName}/available-slots', [\App\Http\Controllers\TrainerSlotController::class, 'availableSlots'])
+        ->name('trainers.available-slots');
 
     // Visitors
     Route::prefix('visitors')->name('visitors.')->group(function () {

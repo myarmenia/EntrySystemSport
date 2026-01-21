@@ -14,6 +14,7 @@ class ScheduleNameDto
     {}
 
     public static  function fromRequestDto(Request $request): ScheduleNameDto {
+        //dd($request);
         return  new self(
             name: $request->name,
 

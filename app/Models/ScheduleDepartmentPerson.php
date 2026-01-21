@@ -26,4 +26,8 @@ class ScheduleDepartmentPerson extends Model
     {
         return $this->belongsTo(\App\Models\Department::class, 'department_id');
     }
+    public function sessionDuration()
+    {
+        return $this->belongsTo(\App\Models\SessionDuration::class, 'session_duration_id');
+    }
 }

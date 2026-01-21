@@ -117,4 +117,9 @@ class User extends Authenticatable
             ->withPivot('is_active')
             ->withTimestamps();
     }
+
+    public function sessionBookings()
+    {
+        return $this->hasMany(PersonSessionBooking::class, 'trainer_id');
+    }
 }
