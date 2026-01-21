@@ -78,12 +78,14 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('calendar-data/{id}', GetCalendarDataController::class);
     Route::get('get-day-reservations/{person}/{date}', GetDayReservationsController::class);
     // ===== TrainerScheduleVisitorsCalendar ===================
-    Route::get('schedule-calendar/{schedule_id}',TrainerScheduleVisitorsCalendarController::class)->name('schedule-calendar');
+    Route::get('schedule-calendar/{schedule_id}', TrainerScheduleVisitorsCalendarController::class)->name('schedule-calendar');
 
 
     // ========People==========================
     //Route::resource('people', PeopleController::class);
     Route::put('/people/{person}', [PeopleController::class, 'update'])->name('people.update');
+    Route::get('/trainers/{trainer}/schedules/{scheduleName}/available-slots', [\App\Http\Controllers\TrainerSlotController::class, 'availableSlots'])
+        ->name('trainers.available-slots');
 
     // Visitors
     Route::prefix('visitors')->name('visitors.')->group(function () {

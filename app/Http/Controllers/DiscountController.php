@@ -20,11 +20,19 @@ class DiscountController extends Controller
 
     public function index()
     {
-        $data = Discount::with('packages')->latest()->paginate(10);
+        $clientId = auth()->user()->client->id;
+        // կամ եթե ունես helper → MyHelper::find_auth_user_client()
+
+        $data = Discount::with('packages')
+            ->where('client_id', $clientId)
+            ->latest()
+            ->paginate(10);
+
         $i = ($data->currentPage() - 1) * $data->perPage();
 
         return view('discounts.index', compact('data', 'i'));
     }
+
 
 
     public function create()

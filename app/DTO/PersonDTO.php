@@ -1,4 +1,5 @@
 <?php
+
 namespace App\DTO;
 
 class PersonDTO
@@ -17,7 +18,8 @@ class PersonDTO
     public $image;
     public $package_id;
     public $trainer_id;
-    public function __construct($id, $entry_code_id, $client_id, $name, $surname, $schedule_name_id, $department_id, $email, $phone, $type, $image, $package_id, $trainer_id)
+    public $session_duration_id;
+    public function __construct($id, $entry_code_id, $client_id, $name, $surname, $schedule_name_id, $department_id, $email, $phone, $type, $image, $package_id, $trainer_id, $session_duration_id)
     {
         $this->id = $id;
         $this->entry_code_id = $entry_code_id;
@@ -32,11 +34,12 @@ class PersonDTO
         $this->image = $image;
         $this->package_id = $package_id;
         $this->trainer_id = $trainer_id;
+        $this->session_duration_id = $session_duration_id;
     }
 
     public static function fromModel($person)
     {
-// dd($person);
+        // dd($person);
         return new self(
             $person->id,
             $person->entry_code_id,
@@ -50,10 +53,8 @@ class PersonDTO
             $person->type,
             $person->image,
             $person->package_id,
-            $person->trainer_id
+            $person->trainer_id,
+            $person->session_duration_id
         );
     }
-
-
-
 }

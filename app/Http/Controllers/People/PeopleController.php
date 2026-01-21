@@ -7,6 +7,7 @@ use App\DTO\PersonDTO;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PersonRequest;
 use App\Models\Person;
+use App\Models\PersonSessionBooking;
 use App\Models\User;
 use App\Services\PersonService;
 use Illuminate\Http\Request;
@@ -58,31 +59,44 @@ class PeopleController extends Controller
         $packages = $this->personService->getPackagesByDiscount();
 
         $trainers = $this->personService->getTrainersList();
-
+        //dd($packages->toArray());
         return view('people.create', compact('entry_codes', 'packages', 'trainers'));
     }
 
     public function store(PersonRequest $request)
     {
+
         $request->merge([
             'type' => 'visitor',
             // package_id թող մնա user-ի ընտրածը
         ]);
-        //dd($request->all());
-        $data = $this->personService->store(NewPersonDto::fromRequestDto($request));
 
-        if ($data) return redirect()->route('visitors.list')->with('success', 'Visitor created');
+        $data = $this->personService->store(NewPersonDto::fromRequestDto($request));
+        if ($data) {
+            return redirect()->route('visitors.list')->with('success', 'Visitor created');
+        }
         return back()->withErrors('Failed to create visitor');
     }
 
     public function edit(string $id)
     {
         $data = $this->personService->edit($id);
-        $packages = $this->personService->getPackagesList();
-
+        $packages = $this->personService->getPackagesByDiscount();
         $trainers = $this->personService->getTrainersList(); // ✅ add
+        $booking = PersonSessionBooking::where('person_id', $id)
+            ->latest('id')
+            ->first();
+        //dd($packages->toArray());
+        $bookings = PersonSessionBooking::where('person_id', $id)
+            ->orderBy('day')        // optional
+            ->orderBy('start_time') // optional
+            ->get();
+
+        $data['bookings'] = $bookings;
+
 
         if (($data['person_connected_schedule_department']['person'] ?? null) != null) {
+            //dd($data);
             return view('people.edit', compact('data', 'packages', 'trainers')); // ✅ add
         }
 
