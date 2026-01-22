@@ -30,7 +30,7 @@ use App\Repositories\TurnstileRepository;
 use App\Repositories\UserRepository;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\View;
+use Carbon\Carbon;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -61,5 +61,6 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Paginator::useBootstrapFive();
+        Carbon::setLocale('hy');
     }
 }

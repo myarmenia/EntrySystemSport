@@ -14,7 +14,7 @@ function calendar() {
 
     var calendar = new FullCalendar.Calendar(calendarEl, {
       locale: 'hy-am',
-      timeZone: 'UTC',
+      timeZone: 'local',
       themeSystem: 'bootstrap5',
       headerToolbar: {
         left: 'prev,next today',
@@ -23,7 +23,10 @@ function calendar() {
       },
       weekNumbers: true,
       dayMaxEvents: true, // allow "more" link when too many events
-      events: `/calendar-data/${id}`,
+      events: `/get-visitors-by-calendar-data/${id}`,
+
+      eventDisplay: 'block',
+      displayEventEnd: true,
       eventTimeFormat: {
         hour: '2-digit', //2-digit, numeric
         minute: '2-digit', //2-digit, numeric
@@ -72,7 +75,7 @@ function calendar() {
   // ========================== E N D ===========================================================
 
 
- 
+
 
 
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Calendar;
 use App\Repositories\TrainerScheduleVisitorsCalendarRepository;
 use Illuminate\Support\Collection;
 
