@@ -1,38 +1,53 @@
 <div class="col-lg-4 col-md-6">
     <div class="mt-3">
         {{-- {{ dd($reservetions) }} --}}
-          <button class="btn btn-primary" id="show_reservetion" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasBoth" aria-controls="offcanvasBoth">Enable both scrolling & backdrop</button>
-          <div class="offcanvas offcanvas-end" data-bs-scroll="true" tabindex="-1" id="offcanvasBoth" aria-labelledby="offcanvasBothLabel">
+        <button class="btn btn-primary" id="show_reservetion" type="button" data-bs-toggle="offcanvas"
+            data-bs-target="#offcanvasBoth" aria-controls="offcanvasBoth">Enable both scrolling & backdrop</button>
+        <div class="offcanvas offcanvas-end" data-bs-scroll="true" tabindex="-1" id="offcanvasBoth"
+            aria-labelledby="offcanvasBothLabel">
+            <div>
+                <h5 id="offcanvasBothLabel" class="offcanvas-title fw-bold m-3">
+                    {{ count($reservetions) > 0 ? $date->translatedFormat('d F Y թ.') : '' }}
+                </h5>
+                <small class="text-muted p-3">
+                    {{ count($reservetions) }} գրանցում
+                </small>
+            </div>
+            <div class="offcanvas-body  mx-0 flex-grow-0">
+                <div class="reservetions">
+                    @forelse ($reservetions as $item)
+                        <div class="card mb-3 border-0 shadow-sm">
+                            <div class="card-body d-flex justify-content-between align-items-center">
 
-                <div class="offcanvas-header">
+                                <div>
+                                    <div class="fw-semibold">
+                                        👤 {{ $item->person->name }} {{ $item->person->surname }}
+                                    </div>
+                                    <div class="text-muted small">
+                                        🕒 {{ $item->start_time }} – {{ $item->end_time }}
+                                    </div>
+                                </div>
 
-                      <h5 id="offcanvasBothLabel" class="offcanvas-title fw-bold">{{count($reservetions) > 0 ?  $date->translatedFormat('d, F Y թ.')  : ''}} </h5>
 
-                      <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+
+                            </div>
+                        </div>
+                    @empty
+                        <div class="text-center mt-5">
+                            <div class="fs-1">📭</div>
+                            <h6 class="fw-bold mt-3">
+                                Գրանցումներ չկան
+                            </h6>
+                            <p class="text-muted small">
+                                Այս օրը այցելուներ չեն գրանցվել
+                            </p>
+                        </div>
+                    @endforelse
+
 
                 </div>
-                <div class="reservetion-result text-center"><span class="text-{{count($reservetions) == 0 ? 'danger' : 'primary'}}">{{count($reservetions) == 0 ? 'Գրանցումներ չկան' : 'Գրանցված այցելուներ'}}</span></div>
-                <div class="offcanvas-body  mx-0 flex-grow-0">
-                    <div class="reservetions">
-                        @if (count($reservetions) > 0)
 
-
-                                <ul class="list-group">
-                                    @foreach ($reservetions as $key => $item)
-                                     <li class="list-group-item list-group-item-primary">{{$item->person->name . ' ' . $item->person->surname . " սկիզբ " . $item->start_time . " ավարտ " . $item->end_time }}</li>
-
-                                    @endforeach
-                                </ul>
-
-
-
-
-
-                        @endif
-
-                    </div>
-
-                </div>
-          </div>
+            </div>
+        </div>
     </div>
 </div>

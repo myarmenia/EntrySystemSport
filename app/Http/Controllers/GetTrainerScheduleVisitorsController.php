@@ -5,13 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\PersonSessionBooking;
 use App\Services\Calendar\TrainerScheduleVisitorsCalendarService;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class GetTrainerScheduleVisitorsController extends Controller
 {
 
     public function __construct(protected TrainerScheduleVisitorsCalendarService $service){}
-    public function __invoke($schedule_id,$date)
+    public function __invoke($schedule_id,$date): View
     {
 
         $data = $this->service->getTrainerScheduleVisitors($schedule_id,auth()->id());
