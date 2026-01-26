@@ -1,0 +1,56 @@
+@extends('layouts.app')
+
+@section('page-script')
+
+
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
+    <script src="{{ asset('assets/js/admin/trainer-visitors-calendar.js') }}"></script>
+    {{-- <link href='https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css' rel='stylesheet'> --}}
+    <link href='https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css' rel='stylesheet'>
+    <script src='https://cdn.jsdelivr.net/npm/@fullcalendar/bootstrap5@6.1.10/index.global.min.js'></script>
+    <script src='https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.11/locales-all.global.min.js'></script>
+    <link href="{{ asset('assets/css/admin/calendar.css') }}" rel='stylesheet' />
+@endsection
+
+@section('content')
+
+
+   <main id="main" class="main">
+
+
+
+    <section class="section">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-10 col-md-10 col-sm-12">
+                    @if($data->isEmpty())
+                        <div class="alert alert-danger">
+                            Դուք չունեք գրանցված այցելուներ
+                        </div>
+                    @endif
+                    <div class="card mb-4">
+                        <div class="card-body py-0">
+
+                            {{-- <p class="mt-2">{{ $data->full_name }}</p> --}}
+
+                            <div id='calendar'></div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <div class="your-component">
+        {{-- $reservetions   գալիս է js-ից --}}
+        {{-- {{ dd($reservetions) }} --}}
+
+        <x-schedule :reservetions=" isset($reservetions) ? $reservetions : [] " ></x-schedule>
+    </div>
+
+  </main><!-- End #main -->
+
+
+@endsection

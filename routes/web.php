@@ -3,6 +3,9 @@
 use App\Http\Controllers\Absence\AbsenceController;
 use App\Http\Controllers\ActionController;
 use App\Http\Controllers\AttendansSheetEnterTimeController;
+use App\Http\Controllers\Calendar\GetTrainerDailyCalendarController;
+use App\Http\Controllers\Calendar\GetTrainerVisitorsCalendarController;
+use App\Http\Controllers\Calendar\TrainerDailyScheduleController;
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\ChangeStatusController;
 use App\Http\Controllers\Component\ClientComponentController;
@@ -18,6 +21,8 @@ use App\Http\Controllers\EntryCode\EntryCodeUpdateController;
 use App\Http\Controllers\ExpertPersonDayScheduleController;
 use App\Http\Controllers\GetCalendarDataController;
 use App\Http\Controllers\GetDayReservationsController;
+use App\Http\Controllers\GetTrainerScheduleVisitorsController;
+use App\Http\Controllers\GetVisitorsByCalendarDateByScheduleController;
 use App\Http\Controllers\People\PeopleController;
 use App\Http\Controllers\People\PeoplelistController;
 use App\Http\Controllers\PersonPermission\PersonPermissionController;
@@ -31,6 +36,8 @@ use App\Http\Controllers\ReportFilterExportController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\Schedule\ScheduleController;
 use App\Http\Controllers\PackageController\PackageController;
+use App\Http\Controllers\Recommendation\TrainerPersonController;
+use App\Http\Controllers\Recommendation\TrainerRecommendationController;
 use App\Http\Controllers\Schedule\ScheduleDetailsController;
 use App\Http\Controllers\Supervised\SupervicedController;
 use App\Http\Controllers\TrainerScheduleVisitorsCalendarController;
@@ -73,14 +80,31 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/change-person-permission-entry-code', [PersonPermissionController::class, 'changeEntryCode']);
 
     Route::post('/client-component', [ClientComponentController::class, 'component'])->name('client.component');
-    // =======Calendar=======================
+    // =======Calendar==========================================
     Route::get('/calendar/{id}', CalendarController::class)->name('calendar');
     Route::get('calendar-data/{id}', GetCalendarDataController::class);
     Route::get('get-day-reservations/{person}/{date}', GetDayReservationsController::class);
-    // ===== TrainerScheduleVisitorsCalendar ===================
-    Route::get('schedule-calendar/{schedule_id}', TrainerScheduleVisitorsCalendarController::class)->name('schedule-calendar');
+    // ====== TrainerScheduleVisitorsCalendar ===================
+    Route::get('schedule-calendar/{schedule_id}',TrainerScheduleVisitorsCalendarController::class)->name('schedule-calendar');
+    Route::get('get-visitors-by-calendar-data/{schedule_id}',GetVisitorsByCalendarDateByScheduleController::class);
+    Route::get('get-trainer-schedule-visitors/{schedule}/{date}',GetTrainerScheduleVisitorsController::class);
+    // ========= TrainerScheduleCalendar =========================
+    Route::get('trainer-calendar/{id}',TrainerDailyScheduleController::class)->name('trainer-schedule-calendar');
+    Route::get('trainer-visitors-calendar/{id}',GetTrainerVisitorsCalendarController::class);
+    Route::get('get-trainer-daily-calendar/{trainer_id}/{date}',GetTrainerDailyCalendarController::class);
+    // ===================Trainer Recommendation ======================
+
+    Route::prefix('recommendation')->name('recommendation.')->group(function () {
+        Route::get('/list',[TrainerRecommendationController::class,'index'])->name('list');
+        Route::get('/create',[TrainerRecommendationController::class,'create'])->name('create');
+        Route::post('/store',[TrainerRecommendationController::class,'store'])->name('store');
+        Route::get('/edit/{id}',[TrainerRecommendationController::class,'edit'])->name('edit');
+        Route::put('/update/{id}', [TrainerRecommendationController::class, 'update'])->name('update');
+        Route::post('trainer-people',[TrainerPersonController::class,'store'])->name('trainer-people');
 
 
+
+    });
     // ========People==========================
     //Route::resource('people', PeopleController::class);
     Route::put('/people/{person}', [PeopleController::class, 'update'])->name('people.update');
