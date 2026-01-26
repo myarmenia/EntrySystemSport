@@ -12,17 +12,14 @@ class EntryCodeUpdateController extends Controller
 {
     use UpdateTrait;
 
-    public function model(){
+    public function model()
+    {
 
         return EntryCode::class;
     }
-    public function update(Request $request,$id)
+    public function update(Request $request, $id)
     {
-        // $1076
-        // dd($request->all());
-
-
-        $data = $this->itemUpdate($request,$id);
+        $data = $this->itemUpdate($request, $id);
         return redirect()->back();
     }
 }

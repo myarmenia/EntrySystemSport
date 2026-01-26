@@ -36,6 +36,7 @@ use App\Http\Controllers\ReportFilterExportController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\Schedule\ScheduleController;
 use App\Http\Controllers\PackageController\PackageController;
+use App\Http\Controllers\Recommendation\TrainerPersonController;
 use App\Http\Controllers\Recommendation\TrainerRecommendationController;
 use App\Http\Controllers\Schedule\ScheduleDetailsController;
 use App\Http\Controllers\Supervised\SupervicedController;
@@ -97,6 +98,11 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/list',[TrainerRecommendationController::class,'index'])->name('list');
         Route::get('/create',[TrainerRecommendationController::class,'create'])->name('create');
         Route::post('/store',[TrainerRecommendationController::class,'store'])->name('store');
+        Route::get('/edit/{id}',[TrainerRecommendationController::class,'edit'])->name('edit');
+        Route::put('/update/{id}', [TrainerRecommendationController::class, 'update'])->name('update');
+        Route::post('trainer-people',[TrainerPersonController::class,'store'])->name('trainer-people');
+
+
 
     });
     // ========People==========================
