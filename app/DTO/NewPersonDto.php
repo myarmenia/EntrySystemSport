@@ -22,7 +22,9 @@ class NewPersonDto
         public ?string  $session_date = null,
         public ?string $start_time = null,
         public ?string $end_time = null,
-        public ?string $weekly_slots_json = null,        
+        public ?string $weekly_slots_json = null,
+        public ?string $payment_method = null,
+        public ?string $payment_bank = null,
     ) {}
 
     public static  function fromRequestDto($request): NewPersonDto
@@ -44,6 +46,8 @@ class NewPersonDto
             start_time: $request->start_time,
             end_time: $request->end_time,
             weekly_slots_json: $request->weekly_slots_json,
+            payment_method: $request->payment_method,
+            payment_bank: $request->payment_bank,
             image: $request->hasFile('image') ? $request->file('image') : null
         );
     }
@@ -68,7 +72,9 @@ class NewPersonDto
             "session_date" => $this->session_date,
             "start_time" => $this->start_time,
             "end_time" => $this->end_time,
-            "weekly_slots_json" => $this->weekly_slots_json
+            "weekly_slots_json" => $this->weekly_slots_json,
+            "payment_method" => $this->payment_method,
+            "payment_bank" => $this->payment_bank,
 
         ], fn($value) => !is_null($value)); // Убираем null-значения
     }

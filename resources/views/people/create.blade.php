@@ -97,27 +97,27 @@ $fixedType = 'visitor';
                                         @foreach($trainers as $t)
                                         @php
                                         $schedArr = $t->scheduleNames->map(function($s) {
-                                        return [
-                                        'id' => $s->id,
-                                        'name' => $s->name,
-                                        'details' => $s->schedule_details
-                                        ? $s->schedule_details->map(fn($d) => [
-                                        'id' => $d->id,
-                                        'week_day' => $d->week_day,
-                                        'day_start_time' => substr($d->day_start_time, 0, 5),
-                                        'day_end_time' => substr($d->day_end_time, 0, 5),
-                                        'break_start_time' => $d->break_start_time ? substr($d->break_start_time, 0, 5) : null,
-                                        'break_end_time' => $d->break_end_time ? substr($d->break_end_time, 0, 5) : null,
-                                        ])->values()
-                                        : [],
-                                        ];
+                                            return [
+                                                'id' => $s->id,
+                                                'name' => $s->name,
+                                                'details' => $s->schedule_details
+                                                    ? $s->schedule_details->map(fn($d) => [
+                                                        'id' => $d->id,
+                                                        'week_day' => $d->week_day,
+                                                        'day_start_time' => substr($d->day_start_time, 0, 5),
+                                                        'day_end_time' => substr($d->day_end_time, 0, 5),
+                                                        'break_start_time' => $d->break_start_time ? substr($d->break_start_time, 0, 5) : null,
+                                                        'break_end_time' => $d->break_end_time ? substr($d->break_end_time, 0, 5) : null,
+                                                    ])->values()
+                                                    : [],
+                                            ];
                                         })->values();
 
                                         $durArr = $t->sessionDurations->map(fn($d) => [
-                                        'id' => $d->id,
-                                        'minutes' => $d->minutes,
-                                        'title' => $d->title,
-                                        'price_amd' => $d->price_amd,
+                                            'id' => $d->id,
+                                            'minutes' => $d->minutes,
+                                            'title' => $d->title,
+                                            'price_amd' => $d->price_amd,
                                         ])->values();
                                         @endphp
 
@@ -168,7 +168,7 @@ $fixedType = 'visitor';
                                 </div>
                             </div>
 
-                            {{-- ✅ MULTI DAY + TIME UI --}}
+                            {{-- MULTI DAY + TIME UI --}}
                             <div class="row mb-3 d-none" id="multiDaysRow">
                                 <label class="col-sm-3 col-form-label">Օրեր / Ժամեր</label>
                                 <div class="col-sm-9" id="multiDaysWrap"></div>
@@ -223,6 +223,7 @@ $fixedType = 'visitor';
                                     </select>
                                 </div>
                             </div>
+
                             {{-- package --}}
                             <div class="row mb-3" id="packageRow">
                                 <label class="col-sm-3 col-form-label">Փաթեթ</label>
@@ -233,43 +234,19 @@ $fixedType = 'visitor';
                                         @foreach($packages as $p)
                                         @php
                                         $basePrice = (int) ($p->price_amd ?? 0);
-
-                                        // ✅ եթե կա is_discounted + discounted_price_amd
                                         $hasDiscount = (bool) ($p->is_discounted ?? false);
                                         $discountedPrice = (int) round($p->discounted_price_amd ?? $basePrice);
+                                        @endphp
 
-                                        // optional: եթե discounts relation-ով ունես ակտիվ discount
-                                        $activeDiscount = null;
-                                        if (!empty($p->discounts) && count($p->discounts) > 0) {
-                                        $now = now();
-                                        $activeDiscount = $p->discounts
-                                        ->where('status', true)
-                                        ->filter(fn($d) => (!$d->starts_at || $d->starts_at <= $now) && (!$d->ends_at || $d->ends_at >= $now))
-                                            ->sortByDesc('starts_at')
-                                            ->first();
-                                            }
-
-                                            $labelDiscount = '';
-                                            if ($activeDiscount) {
-                                            if ($activeDiscount->type === 'percent') {
-                                            $labelDiscount = " ({$activeDiscount->value}% զեղչ)";
-                                            } elseif ($activeDiscount->type === 'fixed') {
-                                            $labelDiscount = " (-{$activeDiscount->value} դրամ)";
-                                            }
-                                            }
-                                            @endphp
-
-                                            <option value="{{ $p->id }}" {{ old('package_id') == $p->id ? 'selected' : '' }}>
-                                                {{ $p->name }} —
-
-                                                @if($hasDiscount)
-                                                {{ number_format($discountedPrice) }} AMD
-                                                <span class="text-success">(զեղչված)</span>
-                                                @else
+                                        <option value="{{ $p->id }}" {{ old('package_id') == $p->id ? 'selected' : '' }}>
+                                            {{ $p->name }} —
+                                            @if($hasDiscount)
+                                                {{ number_format($discountedPrice) }} AMD <span class="text-success">(զեղչված)</span>
+                                            @else
                                                 {{ number_format($basePrice) }} AMD
-                                                @endif
-                                            </option>
-                                            @endforeach
+                                            @endif
+                                        </option>
+                                        @endforeach
                                     </select>
 
                                     @error('package_id')
@@ -280,6 +257,44 @@ $fixedType = 'visitor';
                                 </div>
                             </div>
 
+                            {{-- Payment method (fixed list) --}}
+                            <div class="row mb-3">
+                                <label class="col-sm-3 col-form-label">Վճարման եղանակ</label>
+                                <div class="col-sm-9">
+                                    <select class="form-select" name="payment_method" id="paymentMethod" required>
+                                        <option value="" disabled {{ old('payment_method') ? '' : 'selected' }}>Ընտրել</option>
+                                        <option value="cash" {{ old('payment_method')=='cash' ? 'selected' : '' }}>Կանխիկ</option>
+                                        <option value="cashless" {{ old('payment_method')=='cashless' ? 'selected' : '' }}>Անկանխիկ</option>
+                                        <option value="credit" {{ old('payment_method')=='credit' ? 'selected' : '' }}>Կրեդիտ</option>
+                                    </select>
+                                    @error('payment_method')
+                                    <div class="text-danger fts-14">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            {{-- Bank (only for cashless/credit) --}}
+                            <div class="row mb-3 d-none" id="bankRow">
+                                <label class="col-sm-3 col-form-label">Բանկ</label>
+                                <div class="col-sm-9">
+                                    <select class="form-select" name="payment_bank" id="paymentBank">
+                                        <option value="" disabled {{ old('payment_bank') ? '' : 'selected' }}>Ընտրել բանկ</option>
+                                        <option value="Ameria" {{ old('payment_bank')=='Ameria' ? 'selected' : '' }}>Ameria</option>
+                                        <option value="Ardshin" {{ old('payment_bank')=='Ardshin' ? 'selected' : '' }}>Ardshin</option>
+                                        <option value="ACBA" {{ old('payment_bank')=='ACBA' ? 'selected' : '' }}>ACBA</option>
+                                        <option value="IDBank" {{ old('payment_bank')=='IDBank' ? 'selected' : '' }}>IDBank</option>
+                                        <option value="Inecobank" {{ old('payment_bank')=='Inecobank' ? 'selected' : '' }}>Inecobank</option>
+                                        <option value="Evoca" {{ old('payment_bank')=='Evoca' ? 'selected' : '' }}>Evoca</option>
+                                        <option value="Araratbank" {{ old('payment_bank')=='Araratbank' ? 'selected' : '' }}>Araratbank</option>
+                                        <option value="VTB" {{ old('payment_bank')=='VTB' ? 'selected' : '' }}>VTB</option>
+                                        <option value="Unibank" {{ old('payment_bank')=='Unibank' ? 'selected' : '' }}>Unibank</option>
+                                        <option value="Other" {{ old('payment_bank')=='Other' ? 'selected' : '' }}>Այլ</option>
+                                    </select>
+                                    @error('payment_bank')
+                                    <div class="text-danger fts-14">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
 
                             <div class="row mb-3">
                                 <label class="col-sm-3 col-form-label"></label>
@@ -291,6 +306,7 @@ $fixedType = 'visitor';
                         </form>
                     </div>
                     @endif
+
                     @if ($errors->any())
                     <div class="alert alert-danger">
                         <strong>Validation errors:</strong>
@@ -311,306 +327,390 @@ $fixedType = 'visitor';
 
 @section('page-script')
 <script>
-    document.addEventListener("DOMContentLoaded", () => {
-        const form = document.getElementById("visitorCreateForm");
-        const weeklyJsonInput = document.getElementById("weeklySlotsJson");
+document.addEventListener("DOMContentLoaded", () => {
+    const form = document.getElementById("visitorCreateForm");
+    const weeklyJsonInput = document.getElementById("weeklySlotsJson");
 
-        const trainerSelect = document.getElementById("trainerSelect");
-        const scheduleRow = document.getElementById("trainerScheduleRow");
-        const scheduleSelect = document.getElementById("trainerScheduleSelect");
-        const durationRow = document.getElementById("trainerDurationRow");
-        const durationSelect = document.getElementById("trainerDurationSelect");
+    // ✅ payment elements (always exist)
+    const paymentMethod = document.getElementById("paymentMethod");
+    const bankRow = document.getElementById("bankRow");
+    const paymentBank = document.getElementById("paymentBank");
 
-        const multiRow = document.getElementById("multiDaysRow");
-        const multiWrap = document.getElementById("multiDaysWrap");
+    function toggleBank() {
+        const v = paymentMethod?.value || "";
+        const needsBank = (v === "cashless" || v === "credit");
 
-        if (!trainerSelect) return;
-
-        const DAY_ORDER = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-
-        function timeToMinutes(t) {
-            const [h, m] = String(t).split(":").map(Number);
-            return h * 60 + m;
+        if (needsBank) {
+            bankRow?.classList.remove("d-none");
+            paymentBank?.setAttribute("required", "required");
+        } else {
+            bankRow?.classList.add("d-none");
+            if (paymentBank) {
+                paymentBank.removeAttribute("required");
+                paymentBank.value = "";
+            }
         }
+    }
 
-        function minutesToTime(min) {
-            const h = String(Math.floor(min / 60)).padStart(2, "0");
-            const m = String(min % 60).padStart(2, "0");
-            return `${h}:${m}`;
-        }
+    // initial + on change (old() support)
+    toggleBank();
+    paymentMethod?.addEventListener("change", toggleBank);
 
-        function getTrainerSchedules() {
-            const opt = trainerSelect.selectedOptions?.[0];
-            const schedulesJson = opt?.getAttribute("data-schedules");
-            try {
-                return schedulesJson ? JSON.parse(schedulesJson) : [];
-            } catch (e) {
-                return [];
+    // ✅ trainer elements (might not exist)
+    const trainerSelect = document.getElementById("trainerSelect");
+    const scheduleRow = document.getElementById("trainerScheduleRow");
+    const scheduleSelect = document.getElementById("trainerScheduleSelect");
+    const durationRow = document.getElementById("trainerDurationRow");
+    const durationSelect = document.getElementById("trainerDurationSelect");
+    const multiRow = document.getElementById("multiDaysRow");
+    const multiWrap = document.getElementById("multiDaysWrap");
+
+    const DAY_ORDER = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+
+    function timeToMinutes(t) {
+        const [h, m] = String(t).split(":").map(Number);
+        return h * 60 + m;
+    }
+
+    function minutesToTime(min) {
+        const h = String(Math.floor(min / 60)).padStart(2, "0");
+        const m = String(min % 60).padStart(2, "0");
+        return `${h}:${m}`;
+    }
+
+    function getTrainerSchedules() {
+        if (!trainerSelect) return [];
+        const opt = trainerSelect.selectedOptions?.[0];
+        const schedulesJson = opt?.getAttribute("data-schedules");
+        try { return schedulesJson ? JSON.parse(schedulesJson) : []; } catch(e) { return []; }
+    }
+
+    function getSelectedScheduleDetails() {
+        if (!scheduleSelect) return [];
+        const scheduleId = scheduleSelect.value;
+        if (!scheduleId) return [];
+        const schedules = getTrainerSchedules();
+        const s = schedules.find(x => String(x.id) === String(scheduleId));
+        return s?.details || [];
+    }
+
+    function getDurationMinutes() {
+        if (!durationSelect || !trainerSelect) return 0;
+        const durationId = durationSelect.value;
+        if (!durationId) return 0;
+
+        const opt = trainerSelect.selectedOptions?.[0];
+        const durationsJson = opt?.getAttribute("data-durations");
+
+        let durations = [];
+        try { durations = durationsJson ? JSON.parse(durationsJson) : []; } catch(e) { durations = []; }
+
+        const d = durations.find(x => String(x.id) === String(durationId));
+        return Number(d?.minutes || 0);
+    }
+
+    function buildSlotsForDetail(detail, durationMinutes) {
+        const slots = [];
+        const DAY = 24 * 60;
+
+        let start = timeToMinutes(detail.day_start_time);
+        let end = timeToMinutes(detail.day_end_time);
+
+        if (end <= start) end += DAY;
+
+        let breakStart = null;
+        let breakEnd = null;
+
+        if (detail.break_start_time && detail.break_end_time) {
+            breakStart = timeToMinutes(detail.break_start_time);
+            breakEnd = timeToMinutes(detail.break_end_time);
+
+            if (breakEnd <= breakStart) breakEnd += DAY;
+            if (end > DAY && breakStart < start) {
+                breakStart += DAY;
+                breakEnd += DAY;
             }
         }
 
-        function getSelectedScheduleDetails() {
-            const scheduleId = scheduleSelect?.value;
-            if (!scheduleId) return [];
-            const schedules = getTrainerSchedules();
-            const s = schedules.find(x => String(x.id) === String(scheduleId));
-            return s?.details || [];
-        }
+        for (let t = start; t + durationMinutes <= end; t += durationMinutes) {
+            const slotStart = t;
+            const slotEnd = t + durationMinutes;
 
-        function getDurationMinutes() {
-            const durationId = durationSelect?.value;
-            if (!durationId) return 0;
+            const overlapsBreak = (breakStart != null && breakEnd != null)
+                ? !(slotEnd <= breakStart || slotStart >= breakEnd)
+                : false;
 
-            const opt = trainerSelect.selectedOptions?.[0];
-            const durationsJson = opt?.getAttribute("data-durations");
-
-            let durations = [];
-            try {
-                durations = durationsJson ? JSON.parse(durationsJson) : [];
-            } catch (e) {
-                durations = [];
+            if (!overlapsBreak) {
+                const s = minutesToTime(slotStart % DAY);
+                const e = minutesToTime(slotEnd % DAY);
+                slots.push({ start: s, end: e, label: `${s} - ${e}` });
             }
-
-            const d = durations.find(x => String(x.id) === String(durationId));
-            return Number(d?.minutes || 0);
         }
 
-        function buildSlotsForDetail(detail, durationMinutes) {
-            const slots = [];
-            const DAY = 24 * 60;
+        return slots;
+    }
 
-            let start = timeToMinutes(detail.day_start_time);
-            let end = timeToMinutes(detail.day_end_time);
+    function clearMulti() {
+        if (multiWrap) multiWrap.innerHTML = "";
+        if (multiRow) multiRow.classList.add("d-none");
+        if (weeklyJsonInput) weeklyJsonInput.value = "[]";
+    }
 
-            if (end <= start) end += DAY;
+    function updateWeeklyJson() {
+        if (!weeklyJsonInput || !multiWrap) return;
 
-            let breakStart = null;
-            let breakEnd = null;
+        const result = [];
+        const blocks = multiWrap.querySelectorAll("[data-day-block='1']");
 
-            if (detail.break_start_time && detail.break_end_time) {
-                breakStart = timeToMinutes(detail.break_start_time);
-                breakEnd = timeToMinutes(detail.break_end_time);
+        blocks.forEach(block => {
+            const day = block.getAttribute("data-day") || "";
+            const check = block.querySelector(".dayCheck");
+            const sel = block.querySelector(".dayTimeSelect");
 
-                if (breakEnd <= breakStart) breakEnd += DAY;
+            if (!day || !check?.checked) return;
 
-                if (end > DAY && breakStart < start) {
-                    breakStart += DAY;
-                    breakEnd += DAY;
-                }
-            }
+            const start = sel?.value || "";
+            const end = sel?.selectedOptions?.[0]?.getAttribute("data-end") || "";
 
-            for (let t = start; t + durationMinutes <= end; t += durationMinutes) {
-                const slotStart = t;
-                const slotEnd = t + durationMinutes;
+            if (start && end) result.push({ week_day: day, start_time: start, end_time: end });
+        });
 
-                const overlapsBreak = (breakStart != null && breakEnd != null) ?
-                    !(slotEnd <= breakStart || slotStart >= breakEnd) :
-                    false;
+        weeklyJsonInput.value = JSON.stringify(result);
+    }
 
-                if (!overlapsBreak) {
-                    const s = minutesToTime(slotStart % DAY);
-                    const e = minutesToTime(slotEnd % DAY);
-                    slots.push({
-                        start: s,
-                        end: e,
-                        label: `${s} - ${e}`
-                    });
-                }
-            }
+    function renderMultiDays() {
+        if (!trainerSelect || !scheduleSelect || !durationSelect || !multiWrap || !multiRow) return;
 
-            return slots;
-        }
+        clearMulti();
 
-        function clearMulti() {
-            if (multiWrap) multiWrap.innerHTML = "";
-            if (multiRow) multiRow.classList.add("d-none");
-            if (weeklyJsonInput) weeklyJsonInput.value = "[]";
-        }
+        const scheduleId = scheduleSelect.value;
+        const minutes = getDurationMinutes();
+        const details = getSelectedScheduleDetails();
 
-        function updateWeeklyJson() {
-            if (!weeklyJsonInput) return;
+        if (!trainerSelect.value || !scheduleId || !minutes || !details.length) return;
 
-            const result = [];
-            const blocks = multiWrap?.querySelectorAll("[data-day-block='1']") || [];
+        const byDay = {};
+        details.forEach(d => {
+            if (!byDay[d.week_day]) byDay[d.week_day] = [];
+            byDay[d.week_day].push(d);
+        });
 
-            blocks.forEach(block => {
-                const day = block.getAttribute("data-day") || "";
-                const check = block.querySelector(".dayCheck");
-                const sel = block.querySelector(".dayTimeSelect");
+        DAY_ORDER.forEach(day => {
+            const arr = byDay[day];
+            if (!arr || !arr.length) return;
 
-                if (!day || !check?.checked) return;
+            const allSlots = [];
+            arr.forEach(detail => buildSlotsForDetail(detail, minutes).forEach(s => allSlots.push(s)));
+            if (!allSlots.length) return;
 
-                const start = sel?.value || "";
-                const end = sel?.selectedOptions?.[0]?.getAttribute("data-end") || "";
-
-                if (start && end) {
-                    result.push({
-                        week_day: day,
-                        start_time: start,
-                        end_time: end
-                    });
-                }
+            const seen = new Set();
+            const uniqueSlots = [];
+            allSlots.forEach(s => {
+                const key = `${s.start}-${s.end}`;
+                if (seen.has(key)) return;
+                seen.add(key);
+                uniqueSlots.push(s);
             });
 
-            weeklyJsonInput.value = JSON.stringify(result);
-        }
+            const block = document.createElement("div");
+            block.className = "border rounded p-2 mb-2";
+            block.setAttribute("data-day-block", "1");
+            block.setAttribute("data-day", day);
 
-        function renderMultiDays() {
-            clearMulti();
+            block.innerHTML = `
+                <div class="form-check">
+                    <input class="form-check-input dayCheck" type="checkbox" id="chk_${day}">
+                    <label class="form-check-label fw-semibold" for="chk_${day}">${day}</label>
+                </div>
+                <div class="mt-2 d-none daySlots">
+                    <select class="form-select dayTimeSelect">
+                        <option value="" disabled selected>Ընտրել ժամ</option>
+                    </select>
+                    <div class="small text-muted mt-1">Ընտրիր ժամ</div>
+                </div>
+            `;
 
-            const scheduleId = scheduleSelect?.value;
-            const minutes = getDurationMinutes();
-            const details = getSelectedScheduleDetails();
+            multiWrap.appendChild(block);
 
-            if (!trainerSelect.value || !scheduleId || !minutes || !details.length) return;
+            const sel = block.querySelector(".dayTimeSelect");
+            const slotsBox = block.querySelector(".daySlots");
+            const check = block.querySelector(".dayCheck");
 
-            const byDay = {};
-            details.forEach(d => {
-                if (!byDay[d.week_day]) byDay[d.week_day] = [];
-                byDay[d.week_day].push(d);
+            uniqueSlots.forEach(s => {
+                const o = document.createElement("option");
+                o.value = s.start;
+                o.textContent = s.label;
+                o.setAttribute("data-end", s.end);
+                sel.appendChild(o);
             });
 
-            DAY_ORDER.forEach(day => {
-                const arr = byDay[day];
-                if (!arr || !arr.length) return;
+            check.addEventListener("change", () => {
+                if (check.checked) slotsBox.classList.remove("d-none");
+                else {
+                    slotsBox.classList.add("d-none");
+                    sel.value = "";
+                }
+                updateWeeklyJson();
+            });
 
-                const block = document.createElement("div");
-                block.className = "border rounded p-2 mb-2";
-                block.setAttribute("data-day-block", "1");
-                block.setAttribute("data-day", day);
+            sel.addEventListener("change", updateWeeklyJson);
+        });
 
-                block.innerHTML = `
-        <div class="form-check">
-          <input class="form-check-input dayCheck" type="checkbox" id="chk_${day}">
-          <label class="form-check-label fw-semibold" for="chk_${day}">${day}</label>
-        </div>
+        if (multiWrap.children.length > 0) multiRow.classList.remove("d-none");
+        else multiRow.classList.add("d-none");
 
-        <div class="mt-2 d-none daySlots">
-          <select class="form-select dayTimeSelect">
-            <option value="" disabled selected>Ընտրել ժամ</option>
-          </select>
-          <div class="small text-muted mt-1">Ընտրիր ժամ, որ backend ուղարկվի։</div>
-        </div>
-      `;
+        updateWeeklyJson();
+    }
 
-                multiWrap.appendChild(block);
+    function fillTrainerData() {
+        if (!trainerSelect || !scheduleRow || !scheduleSelect || !durationRow || !durationSelect) return;
 
-                const sel = block.querySelector(".dayTimeSelect");
-                const slotsBox = block.querySelector(".daySlots");
-                const check = block.querySelector(".dayCheck");
+        const opt = trainerSelect.selectedOptions?.[0];
 
-                const allSlots = [];
-                arr.forEach(detail => {
-                    const slots = buildSlotsForDetail(detail, minutes);
-                    slots.forEach(s => allSlots.push(s));
-                });
+        // schedules
+        const schedules = getTrainerSchedules();
+        scheduleSelect.innerHTML = `<option value="" disabled selected>Ընտրել Ժամային գրաֆիկ</option>`;
 
-                // dedupe by start+end
-                const seen = new Set();
-                allSlots.forEach(s => {
-                    const key = `${s.start}-${s.end}`;
-                    if (seen.has(key)) return;
-                    seen.add(key);
+        if (trainerSelect.value && schedules.length) {
+            schedules.forEach(s => {
+                const o = document.createElement("option");
+                o.value = s.id;
+                o.textContent = s.name;
+                scheduleSelect.appendChild(o);
+            });
+            scheduleRow.classList.remove("d-none");
+        } else {
+            scheduleRow.classList.add("d-none");
+        }
 
-                    const o = document.createElement("option");
-                    o.value = s.start;
-                    o.textContent = s.label;
-                    o.setAttribute("data-end", s.end);
-                    sel.appendChild(o);
-                });
+        // durations
+        const durationsJson = opt?.getAttribute("data-durations");
+        let durations = [];
+        try { durations = durationsJson ? JSON.parse(durationsJson) : []; } catch(e) { durations = []; }
 
-                check.addEventListener("change", () => {
-                    if (check.checked) {
-                        slotsBox.classList.remove("d-none");
-                    } else {
-                        slotsBox.classList.add("d-none");
-                        sel.value = "";
+        durationSelect.innerHTML = `<option value="" disabled selected>Ընտրել պարապմունքը</option>`;
+
+        if (trainerSelect.value && durations.length) {
+            durations.forEach(d => {
+                const o = document.createElement("option");
+                o.value = d.id;
+                const title = (d.title && String(d.title).trim().length) ? d.title : "";
+                const labelTitle = title ? ` — ${title}` : "";
+                o.textContent = `${d.minutes} րոպե${labelTitle} — ${d.price_amd} դրամ`;
+                durationSelect.appendChild(o);
+            });
+            durationRow.classList.remove("d-none");
+        } else {
+            durationRow.classList.add("d-none");
+        }
+
+        clearMulti();
+    }
+
+    // ----------------------------
+    // ✅ validation helpers
+    // ----------------------------
+    function setInvalid(el, msg) {
+        if (!el) return;
+        el.classList.add("is-invalid");
+        const old = el.parentElement?.querySelector(".invalid-feedback.js");
+        if (old) old.remove();
+        const div = document.createElement("div");
+        div.className = "invalid-feedback js";
+        div.textContent = msg || "Սխալ արժեք";
+        el.parentElement?.appendChild(div);
+    }
+
+    function clearInvalid(el) {
+        if (!el) return;
+        el.classList.remove("is-invalid");
+        const old = el.parentElement?.querySelector(".invalid-feedback.js");
+        if (old) old.remove();
+    }
+
+    function validateCreateForm() {
+        let ok = true;
+
+        // package
+        const packageSelect = document.getElementById("packageSelect");
+        clearInvalid(packageSelect);
+        if (!packageSelect?.value) {
+            setInvalid(packageSelect, "Ընտրիր փաթեթը");
+            ok = false;
+        }
+
+        // trainer block only if exists + selected
+        if (trainerSelect) {
+            [trainerSelect, scheduleSelect, durationSelect].forEach(clearInvalid);
+
+            const hasTrainer = !!trainerSelect.value;
+            if (hasTrainer) {
+                if (!scheduleSelect?.value) { setInvalid(scheduleSelect, "Ընտրիր ժամային գրաֆիկը"); ok = false; }
+                if (!durationSelect?.value) { setInvalid(durationSelect, "Ընտրիր պարապմունքի տևողությունը"); ok = false; }
+
+                if (scheduleSelect?.value && durationSelect?.value) {
+                    updateWeeklyJson();
+                    let arr = [];
+                    try { arr = JSON.parse(weeklyJsonInput?.value || "[]"); } catch(e) { arr = []; }
+                    if (!Array.isArray(arr) || arr.length === 0) {
+                        setInvalid(durationSelect, "Ընտրիր գոնե 1 օր և ժամ");
+                        ok = false;
                     }
-                    updateWeeklyJson();
-                });
-
-                sel.addEventListener("change", () => {
-                    updateWeeklyJson();
-                });
-            });
-
-            multiRow.classList.remove("d-none");
-            updateWeeklyJson();
-        }
-
-        function fillTrainerData() {
-            const opt = trainerSelect.selectedOptions?.[0];
-
-            // schedules
-            if (scheduleRow && scheduleSelect) {
-                const schedules = getTrainerSchedules();
-                scheduleSelect.innerHTML = `<option value="" disabled selected>Ընտրել Ժամային գրաֆիկ</option>`;
-
-                if (trainerSelect.value && schedules.length) {
-                    schedules.forEach(s => {
-                        const o = document.createElement("option");
-                        o.value = s.id;
-                        o.textContent = s.name;
-                        scheduleSelect.appendChild(o);
-                    });
-                    scheduleRow.classList.remove("d-none");
-                } else {
-                    scheduleRow.classList.add("d-none");
                 }
             }
-
-            // durations
-            if (durationRow && durationSelect) {
-                const durationsJson = opt?.getAttribute("data-durations");
-                let durations = [];
-                try {
-                    durations = durationsJson ? JSON.parse(durationsJson) : [];
-                } catch (e) {
-                    durations = [];
-                }
-
-                durationSelect.innerHTML = `<option value="" disabled selected>Ընտրել պարապմունքը</option>`;
-
-                if (trainerSelect.value && durations.length) {
-                    durations.forEach(d => {
-                        const o = document.createElement("option");
-                        o.value = d.id;
-
-                        const title = (d.title && String(d.title).trim().length) ? d.title : "";
-                        const labelTitle = title ? ` — ${title}` : "";
-                        o.textContent = `${d.minutes} րոպե${labelTitle} — ${d.price_amd} դրամ`;
-                        durationSelect.appendChild(o);
-                    });
-                    durationRow.classList.remove("d-none");
-                } else {
-                    durationRow.classList.add("d-none");
-                }
-            }
-
-            clearMulti();
         }
 
+        // payment
+        clearInvalid(paymentMethod);
+        clearInvalid(paymentBank);
+
+        if (!paymentMethod?.value) {
+            setInvalid(paymentMethod, "Ընտրիր վճարման եղանակը");
+            ok = false;
+        } else {
+            const needsBank = (paymentMethod.value === "cashless" || paymentMethod.value === "credit");
+            if (needsBank && !paymentBank?.value) {
+                setInvalid(paymentBank, "Ընտրիր բանկը");
+                ok = false;
+            }
+        }
+
+        return ok;
+    }
+
+    // submit validation
+    form?.addEventListener("submit", (e) => {
+        updateWeeklyJson();
+        const ok = validateCreateForm();
+        if (!ok) {
+            e.preventDefault();
+            e.stopPropagation();
+            const first = form.querySelector(".is-invalid");
+            first?.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+    });
+
+    // live clear
+    paymentMethod?.addEventListener("change", () => clearInvalid(paymentMethod));
+    paymentBank?.addEventListener("change", () => clearInvalid(paymentBank));
+    document.getElementById("packageSelect")?.addEventListener("change", () => clearInvalid(document.getElementById("packageSelect")));
+
+    if (trainerSelect) {
         trainerSelect.addEventListener("change", () => {
             if (scheduleSelect) scheduleSelect.value = "";
             if (durationSelect) durationSelect.value = "";
+            clearInvalid(trainerSelect);
+            clearInvalid(scheduleSelect);
+            clearInvalid(durationSelect);
             fillTrainerData();
         });
 
-        scheduleSelect?.addEventListener("change", () => {
-            renderMultiDays();
-        });
+        scheduleSelect?.addEventListener("change", () => { clearInvalid(scheduleSelect); renderMultiDays(); });
+        durationSelect?.addEventListener("change", () => { clearInvalid(durationSelect); renderMultiDays(); });
 
-        durationSelect?.addEventListener("change", () => {
-            renderMultiDays();
-        });
-
-        // ✅ before submit make sure JSON is updated
-        form?.addEventListener("submit", () => {
-            updateWeeklyJson();
-        });
-
-        // initial
+        // init
         fillTrainerData();
-    });
+    }
+});
 </script>
 @endsection

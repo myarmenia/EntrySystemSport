@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Dom\Attr;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -57,10 +58,25 @@ class Person extends Model
 
 
 
-    public function absence()
-    {
+    //public function absence()
+    //{
+    //
+    //    return $this->hasMany(Absence::class);
+    //}
 
-        return $this->hasMany(Absence::class);
+    public function absences(): HasMany
+    {
+        return $this->hasMany(Absence::class, 'person_id');
+    }
+
+    public function activeAbsences(): HasMany
+    {
+        $today = now()->toDateString();
+
+        return $this->absences()
+            ->whereDate('start_date', '<=', $today)
+            ->whereDate('end_date', '>=', $today)
+            ->orderByDesc('start_date');
     }
 
     // using in absence/edit.blade.php as accesors
@@ -78,5 +94,37 @@ class Person extends Model
     public function sessionBookings()
     {
         return $this->hasMany(PersonSessionBooking::class);
+    }
+
+    public function payments()
+    {
+        return $this->hasMany(PersonPayment::class);
+    }
+    public function latestPayment(): HasOne
+    {
+        return $this->hasOne(PersonPayment::class, 'person_id')->latestOfMany();
+    }
+
+    // ակտիվ փաթեթ/աբոնեմենտ՝ ըստ booking-ի session_start_time / session_end_time
+    public function activeBookings(): HasMany
+    {
+        return $this->hasMany(PersonSessionBooking::class, 'person_id')
+            ->whereDate('session_start_time', '<=', Carbon::today())
+            ->whereDate('session_end_time', '>=', Carbon::today())
+            ->whereHas('person.latestPayment', function ($q) {
+                $q->where('status', ['paid']);
+            });
+    }
+
+        public function activeBookingsForFilter(): HasMany
+    {
+        return $this->hasMany(PersonSessionBooking::class, 'person_id');
+       
+
+    }
+
+    public function latestBooking(): HasOne
+    {
+        return $this->hasOne(PersonSessionBooking::class, 'person_id')->latestOfMany();
     }
 }

@@ -94,6 +94,12 @@ class PeopleController extends Controller
 
         $data['bookings'] = $bookings;
 
+        $latestPayment = \App\Models\PersonPayment::where('person_id', $id)
+            ->latest('id')
+            ->first();
+
+        $data['latest_payment'] = $latestPayment;
+
 
         if (($data['person_connected_schedule_department']['person'] ?? null) != null) {
             //dd($data);
