@@ -11,7 +11,6 @@ class CalendarController extends Controller
 {
     public function __invoke($id){
 
-
         $data = Person::where('id',$id)->first();
 
         return view('calendar.index',compact('data'));

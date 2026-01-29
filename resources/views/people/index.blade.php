@@ -269,4 +269,5 @@
     </script>
 
 @endsection
+
 <x-modal-delete></x-modal-delete>

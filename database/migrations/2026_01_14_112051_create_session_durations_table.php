@@ -9,7 +9,7 @@ return new class extends Migration {
     {
         Schema::create('session_durations', function (Blueprint $table) {
             $table->id();
-            $table->unsignedSmallInteger('minutes')->unique(); // 60, 90, 120
+            $table->unsignedSmallInteger('minutes'); // 60, 90, 120
             $table->string('title')->nullable();              // "1 ժամ", "2 ժամ"
             $table->unsignedInteger('price_amd');   // trainer-ի գինը տվյալ duration-ի համար
 

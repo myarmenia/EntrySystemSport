@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Dom\Attr;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -57,8 +58,17 @@ class Person extends Model
 
     public function absence()
     {
+        return $this->hasMany(Absence::class, 'person_id');
+    }
 
-        return $this->hasMany(Absence::class);
+    public function activeAbsences(): HasMany
+    {
+        $today = now()->toDateString();
+
+        return $this->absences()
+            ->whereDate('start_date', '<=', $today)
+            ->whereDate('end_date', '>=', $today)
+            ->orderByDesc('start_date');
     }
 
     // using in absence/edit.blade.php as accesors

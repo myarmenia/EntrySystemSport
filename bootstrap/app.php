@@ -36,10 +36,10 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
 
-        //
+        
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        //
+        
     })
     ->withCommands([
         SendEmailCron::class, // Register command here

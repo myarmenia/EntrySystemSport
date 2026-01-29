@@ -1,5 +1,15 @@
 @extends('layouts.app')
 @php
+
+$latestPayment = $data['latest_payment'] ?? null;
+$isPaidNow = old('is_paid');
+if ($isPaidNow === null) {
+$isPaidNow = ($latestPayment && $latestPayment->status === 'paid') ? 1 : 0;
+}
+
+$currentPaymentMethod = old('payment_method') ?? ($latestPayment->payment_method ?? '');
+$currentPaymentBank = old('payment_bank') ?? ($latestPayment->payment_bank ?? '');
+
 $client_schedules = $data['person_connected_schedule_department']['client_schedules'] ?? null;
 $departments = $data['person_connected_schedule_department']['department'] ?? null;
 $person = $data['person_connected_schedule_department']['person'] ?? null;
@@ -20,6 +30,9 @@ $initialWeeklyJson = $bookings->map(fn($b) => [
 'end_time' => \Illuminate\Support\Str::of($b->end_time)->substr(0,5),
 ])->values()->toJson();
 }
+
+$latestBooking = $person->latestBooking;
+$isExpired = $latestBooking && \Carbon\Carbon::parse($latestBooking->session_end_time)->lt(\Carbon\Carbon::today());
 @endphp
 @section("page-script")
 <script src="{{ asset('assets/js/change-person-permission-entry-code.js') }}"></script>
@@ -39,6 +52,69 @@ $initialWeeklyJson = $bookings->map(fn($b) => [
         const multiWrap = document.getElementById("multiDaysWrap");
 
         if (!trainerSelect) return;
+        const changePackageChk = document.getElementById("changePackageChk");
+        const packageSelect = document.getElementById("packageSelect");
+
+        // ✅ payment elements
+        const paymentMethod = document.getElementById("paymentMethod");
+        const bankRow = document.getElementById("bankRow");
+        const paymentBank = document.getElementById("paymentBank");
+
+        function toggleBank() {
+            const v = paymentMethod?.value || "";
+            const needsBank = (v === "cashless" || v === "credit");
+
+            if (needsBank) {
+                bankRow?.classList.remove("d-none");
+                paymentBank?.setAttribute("required", "required");
+            } else {
+                bankRow?.classList.add("d-none");
+                if (paymentBank) {
+                    paymentBank.removeAttribute("required");
+                    paymentBank.value = "";
+                }
+            }
+        }
+
+        // init + change
+        toggleBank();
+        paymentMethod?.addEventListener("change", toggleBank);
+
+
+        function resetScheduleUI() {
+            scheduleRow?.classList.add("d-none");
+            durationRow?.classList.add("d-none");
+            multiRow?.classList.add("d-none");
+
+            if (scheduleSelect) {
+                scheduleSelect.innerHTML = `<option value="" disabled selected>Ընտրել Ժամային գրաֆիկ</option>`;
+                scheduleSelect.value = "";
+            }
+            if (durationSelect) {
+                durationSelect.innerHTML = `<option value="" disabled selected>Ընտրել պարապմունքը</option>`;
+                durationSelect.value = "";
+            }
+
+            if (multiWrap) multiWrap.innerHTML = "";
+            if (weeklyJsonInput) weeklyJsonInput.value = "[]";
+            saved = [];
+        }
+
+        function togglePackage() {
+            if (!changePackageChk || !packageSelect) return;
+
+            if (changePackageChk.checked) {
+                packageSelect.removeAttribute("disabled");
+            } else {
+                packageSelect.setAttribute("disabled", "disabled");
+
+                // ցանկության դեպքում՝ վերադարձնել նախնական selected-ը (person-ի package)
+                // packageSelect.value = String(@json($person->package_id ?? ''));
+            }
+        }
+
+        changePackageChk?.addEventListener("change", togglePackage);
+        togglePackage();
 
         const DAY_ORDER = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
@@ -175,49 +251,62 @@ $initialWeeklyJson = $bookings->map(fn($b) => [
                 const arr = byDay[day];
                 if (!arr?.length) return;
 
+                // ✅ հաշվենք առաջարկվող slot-երը տվյալ օրվա համար
+                const allSlots = [];
+                arr.forEach(detail => {
+                    buildSlotsForDetail(detail, minutes).forEach(s => allSlots.push(s));
+                });
+
+                // ✅ եթե slot չկա՝ օրը չենք ցույց տալիս
+                if (!allSlots.length) return;
+
+                // ✅ dedupe
+                const seen = new Set();
+                const uniqueSlots = [];
+                allSlots.forEach(s => {
+                    const key = `${s.start}-${s.end}`;
+                    if (seen.has(key)) return;
+                    seen.add(key);
+                    uniqueSlots.push(s);
+                });
+
                 const block = document.createElement("div");
                 block.className = "border rounded p-2 mb-2";
                 block.setAttribute("data-day-block", "1");
                 block.setAttribute("data-day", day);
 
                 block.innerHTML = `
-        <div class="form-check">
-          <input class="form-check-input dayCheck" type="checkbox" id="chk_${day}">
-          <label class="form-check-label fw-semibold" for="chk_${day}">${day}</label>
-        </div>
-        <div class="mt-2 d-none daySlots">
-          <select class="form-select dayTimeSelect">
-            <option value="" disabled selected>Ընտրել ժամ</option>
-          </select>
-        </div>
-      `;
+    <div class="form-check">
+      <input class="form-check-input dayCheck" type="checkbox" id="chk_${day}">
+      <label class="form-check-label fw-semibold" for="chk_${day}">${day}</label>
+    </div>
+    <div class="mt-2 d-none daySlots">
+      <select class="form-select dayTimeSelect">
+        <option value="" disabled selected>Ընտրել ժամ</option>
+      </select>
+    </div>
+  `;
+
                 multiWrap.appendChild(block);
 
                 const check = block.querySelector(".dayCheck");
                 const slotsBox = block.querySelector(".daySlots");
                 const sel = block.querySelector(".dayTimeSelect");
 
-                // slots
-                const seen = new Set();
-                arr.forEach(detail => {
-                    buildSlotsForDetail(detail, minutes).forEach(s => {
-                        const key = `${s.start}-${s.end}`;
-                        if (seen.has(key)) return;
-                        seen.add(key);
-
-                        const o = document.createElement("option");
-                        o.value = s.start;
-                        o.textContent = s.label;
-                        o.setAttribute("data-end", s.end);
-                        sel.appendChild(o);
-                    });
+                uniqueSlots.forEach(s => {
+                    const o = document.createElement("option");
+                    o.value = s.start;
+                    o.textContent = s.label;
+                    o.setAttribute("data-end", s.end);
+                    sel.appendChild(o);
                 });
 
-                // restore saved
+                // ✅ restore saved (եթե տվյալ day-ը saved JSON-ում կա)
                 const savedForDay = saved.find(x => String(x.week_day) === String(day));
                 if (savedForDay) {
                     check.checked = true;
                     slotsBox.classList.remove("d-none");
+
                     const start = String(savedForDay.start_time || "").slice(0, 5);
                     if (start) sel.value = start;
                 }
@@ -234,8 +323,15 @@ $initialWeeklyJson = $bookings->map(fn($b) => [
                 sel.addEventListener("change", updateWeeklyJson);
             });
 
-            multiRow.classList.remove("d-none");
+
+            if (multiWrap && multiWrap.children.length > 0) {
+                multiRow.classList.remove("d-none");
+            } else {
+                multiRow.classList.add("d-none");
+                weeklyJsonInput.value = "[]";
+            }
             updateWeeklyJson();
+
         }
 
         function fillSchedulesAndDurations(keepSelected = true) {
@@ -292,18 +388,150 @@ $initialWeeklyJson = $bookings->map(fn($b) => [
         }
 
         trainerSelect.addEventListener("change", () => {
-            // reset saved when trainer changes
+            if (trainerSelect.value === "__remove__") {
+                // ✅ backend-ին ճիշտ արժեք ուղարկելու համար
+                // select-ը submit-ի պահին դարձնենք empty
+                resetScheduleUI();
+                return;
+            }
+
+            // trainer փոխվել է
             saved = [];
             weeklyJsonInput.value = "[]";
             fillSchedulesAndDurations(false);
         });
 
+
         scheduleSelect.addEventListener("change", renderMultiDays);
         durationSelect.addEventListener("change", renderMultiDays);
 
-        form?.addEventListener("submit", () => updateWeeklyJson());
+        form?.addEventListener("submit", () => {
+            updateWeeklyJson();
+
+            if (trainerSelect.value === "__remove__") {
+                // ✅ request-ում trainer_id դատարկ կգնա
+                trainerSelect.value = "";
+            }
+        });
 
         // init
+        function setInvalid(el, msg) {
+            if (!el) return;
+            el.classList.add("is-invalid");
+
+            // remove old feedback
+            const old = el.parentElement?.querySelector(".invalid-feedback.js");
+            if (old) old.remove();
+
+            const div = document.createElement("div");
+            div.className = "invalid-feedback js";
+            div.textContent = msg || "Սխալ արժեք";
+            el.parentElement?.appendChild(div);
+        }
+
+        function clearInvalid(el) {
+            if (!el) return;
+            el.classList.remove("is-invalid");
+            const old = el.parentElement?.querySelector(".invalid-feedback.js");
+            if (old) old.remove();
+        }
+
+        function validateForm() {
+            let ok = true;
+
+            // ✅ clear previous errors
+            [trainerSelect, scheduleSelect, durationSelect, packageSelect].forEach(clearInvalid);
+
+            // -------- Trainer logic --------
+            const trainerVal = trainerSelect?.value || "";
+
+            // placeholder "" (disabled) չի submit անում, բայց if current empty -> ignore
+            const isRemoveTrainer = trainerVal === "__remove__";
+            const hasTrainer = !!trainerVal && !isRemoveTrainer;
+
+            // եթե user-ը ոչինչ չի ընտրել (placeholder) և currentTrainerId չունես, կարող ես պարտադրել՝
+            // բայց քո edit-ում գուցե trainer չունենա, դրա համար չենք պարտադրում trainer-ը
+
+            if (hasTrainer) {
+                // schedule required
+                if (!scheduleSelect?.value) {
+                    setInvalid(scheduleSelect, "Ընտրիր ժամային գրաֆիկը");
+                    ok = false;
+                }
+
+                // duration required
+                if (!durationSelect?.value) {
+                    setInvalid(durationSelect, "Ընտրիր պարապմունքի տևողությունը");
+                    ok = false;
+                }
+
+                // weekly slots required (եթե schedule + duration ընտրված են)
+                if (scheduleSelect?.value && durationSelect?.value) {
+                    // ensure latest json
+                    updateWeeklyJson();
+
+                    let arr = [];
+                    try {
+                        arr = JSON.parse(weeklyJsonInput?.value || "[]");
+                    } catch (e) {
+                        arr = [];
+                    }
+
+                    if (!Array.isArray(arr) || arr.length === 0) {
+                        // multiRow-ի տակ error ցույց տանք
+                        setInvalid(durationSelect, "Ընտրիր գոնե 1 օր և ժամ");
+                        ok = false;
+                    }
+                }
+            }
+
+            // եթե trainer remove է → schedule/duration/slots պետք չի ստուգել
+            // եթե trainer empty է → նույնպես skip
+
+            // -------- Package logic --------
+            if (changePackageChk?.checked) {
+                if (!packageSelect?.value) {
+                    setInvalid(packageSelect, "Ընտրիր փաթեթը կամ անջատի checkbox-ը");
+                    ok = false;
+                }
+            } else {
+                clearInvalid(packageSelect);
+            }
+
+            return ok;
+        }
+
+        // ✅ live validation clears
+        trainerSelect?.addEventListener("change", () => {
+            clearInvalid(trainerSelect);
+            clearInvalid(scheduleSelect);
+            clearInvalid(durationSelect);
+        });
+
+        scheduleSelect?.addEventListener("change", () => clearInvalid(scheduleSelect));
+        durationSelect?.addEventListener("change", () => clearInvalid(durationSelect));
+        packageSelect?.addEventListener("change", () => clearInvalid(packageSelect));
+        changePackageChk?.addEventListener("change", () => clearInvalid(packageSelect));
+
+        // ✅ submit validation
+        form?.addEventListener("submit", (e) => {
+            // եթե remove trainer ընտրված է՝ submit-ից առաջ trainer_id դատարկ ուղարկենք (քեզ մոտ արդեն կա)
+            // updateWeeklyJson() նույնպես կանչվում է
+
+            const ok = validateForm();
+            if (!ok) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                // optional: scroll to first invalid
+                const first = form.querySelector(".is-invalid");
+                first?.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center"
+                });
+            }
+        });
+
         fillSchedulesAndDurations(true);
     });
 </script>
@@ -407,11 +635,18 @@ $initialWeeklyJson = $bookings->map(fn($b) => [
                             </div>
 
                             {{-- TRAINER SELECT --}}
+                            {{-- TRAINER SELECT --}}
                             <div class="row mb-3" id="trainerRow">
                                 <label class="col-sm-3 col-form-label">Մարզիչ</label>
                                 <div class="col-sm-9">
                                     <select class="form-select" name="trainer_id" id="trainerSelect">
-                                        <option value="" disabled {{ $currentTrainerId ? '' : 'selected' }}>Ընտրել մարզիչ</option>
+                                        {{-- placeholder --}}
+                                        <option value="" disabled {{ $currentTrainerId ? '' : 'selected' }}>
+                                            Ընտրել մարզիչ
+                                        </option>
+
+                                        {{-- ✅ remove trainer --}}
+                                        <option value="__remove__">— Հանել մարզիչը —</option>
 
                                         @if(isset($trainers) && count($trainers) > 0)
                                         @foreach($trainers as $t)
@@ -441,7 +676,6 @@ $initialWeeklyJson = $bookings->map(fn($b) => [
                                         ])->values();
                                         @endphp
 
-
                                         <option
                                             value="{{ $t->id }}"
                                             data-schedules='@json($schedArr)'
@@ -460,6 +694,7 @@ $initialWeeklyJson = $bookings->map(fn($b) => [
                                     @enderror
                                 </div>
                             </div>
+
 
                             {{-- SCHEDULE --}}
                             <div class="row mb-3 d-none" id="trainerScheduleRow">
@@ -585,30 +820,54 @@ $initialWeeklyJson = $bookings->map(fn($b) => [
                             {{-- Package --}}
                             <div class="row mb-3" id="packageRow">
                                 <label class="col-sm-3 col-form-label">Փաթեթ</label>
+
                                 <div class="col-sm-9">
-                                    <select class="form-select" name="package_id" id="packageSelect">
-                                        <option value="" disabled {{ old('package_id', $person->package_id ?? null) ? '' : 'selected' }}>Ընտրել փաթեթը</option>
-                                        @if(isset($packages) && count($packages) > 0)
+                                    <div class="form-check mb-2">
+                                        <input
+                                            class="form-check-input"
+                                            type="checkbox"
+                                            id="changePackageChk"
+                                            name="change_package"
+                                            value="1"
+                                            {{ old('change_package') ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="changePackageChk">
+                                            Փոխել փաթեթը
+                                        </label>
+                                    </div>
+
+                                    <select
+                                        class="form-select"
+                                        name="package_id"
+                                        id="packageSelect"
+                                        {{ old('change_package') ? '' : 'disabled' }}>
+                                        <option value="" disabled {{ old('package_id', $person->package_id ?? null) ? '' : 'selected' }}>
+                                            Ընտրել փաթեթը
+                                        </option>
+
                                         @foreach($packages as $p)
                                         @php
                                         $hasDiscount = (bool)($p->is_discounted ?? false);
-                                        $finalPrice = $hasDiscount
-                                        ? (int) round($p->discounted_price_amd)
-                                        : (int) $p->price_amd;
+                                        $finalPrice = $hasDiscount ? (int) round($p->discounted_price_amd) : (int) $p->price_amd;
                                         @endphp
 
-                                        <option value="{{ $p->id }}"
+                                        <option
+                                            value="{{ $p->id }}"
                                             {{ (string)old('package_id', $person->package_id ?? '') === (string)$p->id ? 'selected' : '' }}>
-                                            {{ $p->months }} ամիս —
-                                            {{ number_format($finalPrice) }} դրամ
+                                            {{ $p->months }} ամիս — {{ number_format($finalPrice) }} դրամ
                                             @if($hasDiscount)
                                             (զեղչված, {{ number_format((int)$p->price_amd) }})
                                             @endif
                                         </option>
                                         @endforeach
-
-                                        @endif
                                     </select>
+                                    @if($isExpired)
+                                    <div class="small text-danger fw-semibold mt-1">
+                                        ⚠ Փաթեթի ժամկետը ավարտվել է ({{ \Carbon\Carbon::parse($latestBooking->session_end_time)->format('d.m.Y') }})
+                                    </div>
+                                    @endif
+                                    <small class="text-muted d-block mt-1">
+                                        Եթե “Փոխել փաթեթը”-ը չնշես, փաթեթը չի փոխվի update-ի ժամանակ։
+                                    </small>
 
                                     @error('package_id')
                                     <div class="mb-3 row justify-content-end">
@@ -617,6 +876,69 @@ $initialWeeklyJson = $bookings->map(fn($b) => [
                                     @enderror
                                 </div>
                             </div>
+
+                            {{-- ✅ Payment method --}}
+                            <div class="row mb-3">
+                                <label class="col-sm-3 col-form-label">Վճարման եղանակ</label>
+                                <div class="col-sm-9">
+                                    <select class="form-select" name="payment_method" id="paymentMethod" required>
+                                        <option value="" disabled {{ $currentPaymentMethod ? '' : 'selected' }}>Ընտրել</option>
+
+                                        <option value="cash" {{ $currentPaymentMethod==='cash' ? 'selected' : '' }}>Կանխիկ</option>
+                                        <option value="cashless" {{ $currentPaymentMethod==='cashless' ? 'selected' : '' }}>Անկանխիկ</option>
+                                        <option value="credit" {{ $currentPaymentMethod==='credit' ? 'selected' : '' }}>Կրեդիտ</option>
+                                    </select>
+
+                                    @error('payment_method')
+                                    <div class="text-danger fts-14">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            {{-- ✅ Bank (only for cashless/credit) --}}
+                            <div class="row mb-3 d-none" id="bankRow">
+                                <label class="col-sm-3 col-form-label">Բանկ</label>
+                                <div class="col-sm-9">
+                                    <select class="form-select" name="payment_bank" id="paymentBank">
+                                        <option value="" disabled {{ $currentPaymentBank ? '' : 'selected' }}>Ընտրել բանկ</option>
+
+                                        <option value="Ameria" {{ $currentPaymentBank==='Ameria' ? 'selected' : '' }}>Ameria</option>
+                                        <option value="Ardshin" {{ $currentPaymentBank==='Ardshin' ? 'selected' : '' }}>Ardshin</option>
+                                        <option value="ACBA" {{ $currentPaymentBank==='ACBA' ? 'selected' : '' }}>ACBA</option>
+                                        <option value="IDBank" {{ $currentPaymentBank==='IDBank' ? 'selected' : '' }}>IDBank</option>
+                                        <option value="Inecobank" {{ $currentPaymentBank==='Inecobank' ? 'selected' : '' }}>Inecobank</option>
+                                        <option value="Evoca" {{ $currentPaymentBank==='Evoca' ? 'selected' : '' }}>Evoca</option>
+                                        <option value="Araratbank" {{ $currentPaymentBank==='Araratbank' ? 'selected' : '' }}>Araratbank</option>
+                                        <option value="VTB" {{ $currentPaymentBank==='VTB' ? 'selected' : '' }}>VTB</option>
+                                        <option value="Unibank" {{ $currentPaymentBank==='Unibank' ? 'selected' : '' }}>Unibank</option>
+                                        <option value="Other" {{ $currentPaymentBank==='Other' ? 'selected' : '' }}>Այլ</option>
+                                    </select>
+
+                                    @error('payment_bank')
+                                    <div class="text-danger fts-14">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            {{-- ✅ Paid status checkbox --}}
+                            <div class="row mb-3">
+                                <label class="col-sm-3 col-form-label">Վճարված է</label>
+                                <div class="col-sm-9">
+                                    <div class="form-check mt-2">
+                                        <input
+                                            class="form-check-input"
+                                            type="checkbox"
+                                            id="isPaidChk"
+                                            name="is_paid"
+                                            value="1"
+                                            {{ (string)$isPaidNow === '1' ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="isPaidChk">
+                                            Նշել որպես վճարված
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
 
                             <div class="row mb-3">
                                 <label class="col-sm-3 col-form-label"></label>
