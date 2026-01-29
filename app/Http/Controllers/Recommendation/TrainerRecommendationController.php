@@ -23,8 +23,6 @@ class TrainerRecommendationController extends Controller
 
         $data = Recommendation::where('trainer_id', auth()->id())->get();
         $booking = Person::where('trainer_id',auth()->id())->get();
-
-
         $i = 0;
 
         return view('trainer-recommendation.index', compact(['data','booking', 'i']));

@@ -1,7 +1,9 @@
 $(function () {
     // բացվում է մոդալը
     $(".click_attach_person").on("click", function () {
-        let recommendationId = $(this).data("data-id");
+
+        let recommendationId = $(this).parents('.action').attr("data-id");
+
         $("#recommendation_id").val(recommendationId);
 
         $('#select_all').on('change', function () {
@@ -33,7 +35,7 @@ $(function () {
 
         // debug
         for (let pair of formData.entries()) {
-            console.log(pair[0], pair[1]);
+            console.log(pair[0],'111', pair[1]);
         }
 
         $.ajax({

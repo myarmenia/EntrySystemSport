@@ -55,8 +55,6 @@ class Person extends Model
         return $this->hasMany(ScheduleDepartmentPerson::class);
     }
 
-
-
     public function absence()
     {
 
@@ -78,5 +76,9 @@ class Person extends Model
     public function sessionBookings()
     {
         return $this->hasMany(PersonSessionBooking::class);
+    }
+    public function recommendations()
+    {
+        return $this->belongsToMany(Recommendation::class,'person_recommendation')->withTimestamps();
     }
 }

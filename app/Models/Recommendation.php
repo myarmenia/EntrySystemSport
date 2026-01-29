@@ -15,7 +15,16 @@ class Recommendation extends Model
     protected $casts = [
         "trainer_id"  => 'int',
         "name"        => "string",
-        "description" =>"string"
+        "description" => "string"
     ];
+    public function persons()
+    {
+        return $this->belongsToMany(Person::class,'person_recommendation')->withTimestamps();
+    }
+
+    public function trainer()
+    {
+        return $this->belongsTo(User::class, 'trainer_id');
+    }
 
 }
