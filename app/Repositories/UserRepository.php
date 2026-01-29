@@ -89,6 +89,7 @@ class UserRepository implements UserRepositoryInterface
     //}
     public function store(array $data): User
     {
+        // dd($data);
         return DB::transaction(function () use ($data) {
 
             $role = $data['roles'] ?? null;
@@ -153,7 +154,7 @@ class UserRepository implements UserRepositoryInterface
             }
 
             /* ===========================
-           CLIENT / STAFF LOGIC (քոնն 그대로)
+           CLIENT / STAFF LOGIC
         ============================ */
 
             if (isset($data['client']['name']) && $data['client']['name'] != null) {

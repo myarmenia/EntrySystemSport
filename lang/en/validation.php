@@ -225,7 +225,8 @@ return [
      "break_start_time" => "Ընդմիջման սկիզբ",
      "break_end_time" => "Ընդմիջման ավարտ",
      "start_date" => "Սկիզբ",
-     "end_date" => "Ավարտ"
+     "end_date" => "Ավարտ",
+     "description" => "Նկարագրություն"
 
   ]
 

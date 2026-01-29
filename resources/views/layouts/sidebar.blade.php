@@ -36,7 +36,7 @@
         <li class="nav-item">
             <a class="nav-link {{ Route::is(['schedule.list', 'schedule.create', 'schedule.edit']) ? '' : 'collapsed' }}"
                 href="{{ route('schedule.list') }}">
-                <i class="bi bi-person"></i>
+                <i class="bi bi-calendar-event"></i>
                 <span>
                     @if ($user->hasAnyRole(['client_admin', 'client_admin_rfID', 'manager']))
                     Հերթափոխեր
@@ -80,6 +80,21 @@
             <a class="nav-link {{ Route::is('visitors.*') ? '' : 'collapsed' }}" href="{{ route('visitors.list') }}">
                 <i class="bi bi-person"></i>
                 <span>Այցելուներ</span>
+            </a>
+        </li>
+
+        @endif
+        @if ($user->hasRole(['trainer']))
+         <li class="nav-item">
+            <a class="nav-link {{ Route::is('trainer-schedule-calendar') ? '' : 'collapsed' }}" href="{{ route('trainer-schedule-calendar',auth()->id()) }}">
+                <i class="bi bi-clock"></i>
+                <span>Զբաղվածություն</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {{ Route::is('recommendation.*') ? '' : 'collapsed' }}" href="{{ route('recommendation.list') }}">
+                <i class="bi bi-journal-text"></i>
+                <span>Մարզչի խորհուրդներ</span>
             </a>
         </li>
         @endif

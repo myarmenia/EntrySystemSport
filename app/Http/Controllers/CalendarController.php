@@ -10,7 +10,6 @@ use Illuminate\Http\Request;
 class CalendarController extends Controller
 {
     public function __invoke($id){
-//dd($id);
 
         $data = Person::where('id',$id)->first();
 
