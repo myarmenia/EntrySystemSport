@@ -19,7 +19,8 @@ class PersonDTO
     public $package_id;
     public $trainer_id;
     public $session_duration_id;
-    public function __construct($id, $entry_code_id, $client_id, $name, $surname, $schedule_name_id, $department_id, $email, $phone, $type, $image, $package_id, $trainer_id, $session_duration_id)
+    public $change_package;
+    public function __construct($id, $entry_code_id, $client_id, $name, $surname, $schedule_name_id, $department_id, $email, $phone, $type, $image, $package_id, $trainer_id, $session_duration_id, $change_package)
     {
         $this->id = $id;
         $this->entry_code_id = $entry_code_id;
@@ -35,6 +36,7 @@ class PersonDTO
         $this->package_id = $package_id;
         $this->trainer_id = $trainer_id;
         $this->session_duration_id = $session_duration_id;
+        $this->change_package = $change_package;
     }
 
     public static function fromModel($person)
@@ -54,7 +56,8 @@ class PersonDTO
             $person->image,
             $person->package_id,
             $person->trainer_id,
-            $person->session_duration_id
+            $person->session_duration_id,
+            $person->change_package
         );
     }
 }
