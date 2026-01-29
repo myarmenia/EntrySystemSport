@@ -29,6 +29,7 @@
 
             </div>
         </div>
+        <div id="successAlert"></div>
 
         @session('success')
             <div class="alert alert-success" role="alert">
@@ -41,56 +42,54 @@
             </div>
         @endsession
 
-        <table class="table table-bordered">
-            <tr>
-                <th>Հ/Հ</th>
-                <th>Անուն</th>
-                <th>Նկարագրություն</th>
-                <th width="280px">Գործողություն</th>
-            </tr>
-            @foreach ($data as $key => $recommendation)
+        @if(count($data)==0)
+            <div class="alert alert-danger">
+                Այս պահին դուք չունեք ստեղծված խորհուրդներ
+            </div>
+
+        @endif
+        @if (count($data) > 0)
+            <table class="table table-bordered">
                 <tr>
-                    <td>{{ ++$i }}</td>
-                    <td>{{ $recommendation->name }}</td>
-                    <td>{{ $recommendation->description }}</td>
-
-                    <td>
-                        <div class="dropdown action" data-id="{{ $recommendation->id }}" data-tb-name="recommendations">
-                            <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                                <i class="bx bx-dots-vertical-rounded"></i>
-                            </button>
-
-                            <div class="dropdown-menu">
-
-                                {{-- @if ($person != null)
-                                    <a class="dropdown-item" href="{{route('calendar', $person->id)}}">
-                                        <i class="bi bi-calendar-event"></i>Ժամանակացույց
-                                    </a>
-
-                                @endif
-                                <a class="dropdown-item" href="{{route('absence.list', $person->id)}}"><i
-                                        class="bi bi-person-x me-1"></i>Հարգելի Բացակա</a> --}}
-
-                                <button type="button" class="dropdown-item click_attach_person" data-bs-toggle="modal"
-                                    data-user="{{ $booking }}"
-                                    data-bs-target="#trainerPerson">
-                                    <i class="bi bi-person-plus me-1"></i>
-                                    Կցել</button>
-
-                                <a class="dropdown-item" href="{{route('recommendation.edit', $recommendation->id)}}"><i
-                                        class="bx bx-edit-alt me-1"></i>Խմբագրել</a>
-                                <button type="button" class="dropdown-item click_delete_item" data-bs-toggle="modal"
-                                    data-bs-target="#smallModal">
-                                    <i class="bx bx-trash me-1"></i>
-                                    Ջնջել</button>
-                            </div>
-                        </div>
-
-                    </td>
+                    <th>Հ/Հ</th>
+                    <th>Անուն</th>
+                    <th>Նկարագրություն</th>
+                    <th width="280px">Գործողություն</th>
                 </tr>
-            @endforeach
-        </table>
+                @foreach ($data as $key => $recommendation)
+                    <tr>
+                        <td>{{ ++$i }}</td>
+                        <td>{{ $recommendation->name }}</td>
+                        <td>{!! $recommendation->description !!}</td>
+
+                        <td>
+                            <div class="dropdown action" data-id="{{ $recommendation->id }}" data-tb-name="recommendations">
+                                <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                                    <i class="bx bx-dots-vertical-rounded"></i>
+                                </button>
+
+                                <div class="dropdown-menu">
+                                    @if (count($booking) > 0)
+                                        <button type="button" class="dropdown-item click_attach_person" data-bs-toggle="modal"
+                                            data-user="{{ $booking }}" data-bs-target="#trainerPerson">
+                                            <i class="bi bi-person-plus me-1"></i>
+                                            Կցել</button>
+                                    @endif
+                                    <a class="dropdown-item" href="{{route('recommendation.edit', $recommendation->id)}}"><i
+                                            class="bx bx-edit-alt me-1"></i>Խմբագրել</a>
+                                    <button type="button" class="dropdown-item click_delete_item" data-bs-toggle="modal"
+                                        data-bs-target="#smallModal">
+                                        <i class="bx bx-trash me-1"></i>
+                                        Ջնջել</button>
+                                </div>
+                            </div>
+
+                        </td>
+                    </tr>
+                @endforeach
+            </table>
+        @endif
     </main>
 @endsection
 <x-modal-delete></x-modal-delete>
-<x-trainer-person :booking="$booking"/>
+<x-trainer-person :booking="$booking" />

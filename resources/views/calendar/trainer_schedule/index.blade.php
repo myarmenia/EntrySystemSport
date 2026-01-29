@@ -29,11 +29,17 @@
                 </ol>
             </nav>
         </h4>
+
         <div class="container">
             <div class="row">
                 <div class="col-lg-10 col-md-10 col-sm-12">
                     <div class="card mb-4">
                         <div class="card-body py-0">
+                             @if($data->isEmpty())
+                                <div class="alert alert-danger">
+                                    Դուք չունեք գրանցված այցելուներ
+                                </div>
+                             @endif
 
                             {{-- <p class="mt-2">{{ $data->full_name }}</p> --}}
 

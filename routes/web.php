@@ -100,7 +100,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::post('/store',[TrainerRecommendationController::class,'store'])->name('store');
         Route::get('/edit/{id}',[TrainerRecommendationController::class,'edit'])->name('edit');
         Route::put('/update/{id}', [TrainerRecommendationController::class, 'update'])->name('update');
-        Route::post('trainer-people',[PersonRecommendationController::class,'store'])->name('trainer-people');
+        Route::post('person-recommendation',[PersonRecommendationController::class,'store'])->name('trainer-people');
 
 
 

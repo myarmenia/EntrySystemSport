@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
             $table->foreignId('person_id')->constrained('people')->cascadeOnDelete();
             $table->foreignId('recommendation_id')->constrained('recommendations')->cascadeOnDelete();
-            $table->date('assigned_at')->nullable();
             $table->unique(['person_id', 'recommendation_id']);
             $table->timestamps();
         });
