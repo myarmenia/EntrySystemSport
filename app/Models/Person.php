@@ -60,12 +60,12 @@ class Person extends Model
     {
         return $this->hasMany(Absence::class, 'person_id');
     }
-
+   
     public function activeAbsences(): HasMany
     {
         $today = now()->toDateString();
 
-        return $this->absences()
+        return $this->absence()
             ->whereDate('start_date', '<=', $today)
             ->whereDate('end_date', '>=', $today)
             ->orderByDesc('start_date');
@@ -111,7 +111,7 @@ class Person extends Model
         public function activeBookingsForFilter(): HasMany
     {
         return $this->hasMany(PersonSessionBooking::class, 'person_id');
-       
+
 
     }
 
