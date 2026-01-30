@@ -127,4 +127,6 @@ class Person extends Model
     {
         return $this->hasOne(PersonSessionBooking::class, 'person_id')->latestOfMany();
     }
+
+    ////////
 }
