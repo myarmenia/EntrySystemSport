@@ -96,6 +96,12 @@ class Person extends Model
         return $this->hasMany(PersonSessionBooking::class);
     }
 
+
+
+
+
+
+    /////
     public function payments()
     {
         return $this->hasMany(PersonPayment::class);
