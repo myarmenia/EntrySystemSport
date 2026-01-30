@@ -56,15 +56,7 @@ class Person extends Model
         return $this->hasMany(ScheduleDepartmentPerson::class);
     }
 
-
-
-    //public function absence()
-    //{
-    //
-    //    return $this->hasMany(Absence::class);
-    //}
-
-    public function absences(): HasMany
+    public function absence()
     {
         return $this->hasMany(Absence::class, 'person_id');
     }
@@ -96,12 +88,6 @@ class Person extends Model
         return $this->hasMany(PersonSessionBooking::class);
     }
 
-
-
-
-
-
-    /////
     public function payments()
     {
         return $this->hasMany(PersonPayment::class);
@@ -129,10 +115,15 @@ class Person extends Model
 
     }
 
-    public function latestBooking(): HasOne
+  public function latestBooking(): HasOne
     {
         return $this->hasOne(PersonSessionBooking::class, 'person_id')->latestOfMany();
     }
 
-    ////////
+    public function recommendations()
+
+    {
+        return $this->belongsToMany(Recommendation::class,'person_recommendation')->withTimestamps();
+    }
+
 }

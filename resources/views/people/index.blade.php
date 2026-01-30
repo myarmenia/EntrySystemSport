@@ -1,374 +1,272 @@
 @extends('layouts.app')
 
 @section("page-script")
-<script src="{{ asset('assets/js/change-status.js') }}"></script>
-<script src="{{ asset('assets/js/delete-item.js') }}"></script>
+    <script src="{{ asset('assets/js/change-status.js') }}"></script>
+    <script src="{{ asset('assets/js/delete-item.js') }}"></script>
 @endsection
 
 @section('content')
 
 
+    {{-- commentel em heto karox e petq gal --}}
+    {{-- @include("navbar") --}}
 
 
-<style>
-    /* ✅ table-responsive թող աշխատի, որ mobile-ում scroll լինի */
-    .card-body.table-responsive {
-        overflow-x: auto !important;
-        overflow-y: hidden !important;
-    }
-
-    .col-pay {
-        width: 170px;
-        white-space: normal;
-        overflow-wrap: anywhere;
-        word-break: break-word;
-    }
-
-    .pay-green {
-        background: #d1fae5 !important;
-    }
-
-    /* paid */
-    .pay-red {
-        background: #fee2e2 !important;
-    }
-
-    /* not paid */
-    .pay-gray {
-        background: #f3f4f6 !important;
-    }
-
-    /* no active package (optional) */
-
-
-    .idx-green {
-        background: #d1fae5 !important;
-    }
-
-    /* կանաչ */
-    .idx-red {
-        background: #fee2e2 !important;
-    }
-
-    /* կարմիր */
-
-
-    /* fallback: եթե template-ը կտրում է dropdown-ը, սա կփրկի */
-    .visitors-table .dropdown-menu {
-        position: fixed !important;
-    }
-
-
-    .dropdown-menu {
-        z-index: 9999;
-    }
-
-
-    /* ✅ stable layout */
-    .visitors-table {
-        width: 100%;
-        table-layout: fixed;
-        /* stable column widths */
-        min-width: 1100px;
-        /* որ շատ սեղմ չլինի, mobile-ում scroll կանի */
-    }
-
-    .visitors-table th,
-    .visitors-table td {
-        padding: 6px 8px;
-        vertical-align: middle;
-    }
-
-    /* ✅ column width helpers */
-    .col-idx {
-        width: 52px;
-        white-space: nowrap;
-        text-align: center;
-    }
-
-    .col-code {
-        width: 90px;
-        white-space: nowrap;
-    }
-
-    .col-img {
-        width: 90px;
-        white-space: nowrap;
-    }
-
-    .col-phone {
-        width: 130px;
-        white-space: normal;
-        overflow-wrap: anywhere;
-        word-break: break-word;
-    }
-
-    .col-super {
-        width: 90px;
-        white-space: nowrap;
-        text-align: center;
-    }
-
-    .col-abs {
-        width: 110px;
-        white-space: nowrap;
-    }
-
-    .col-act {
-        width: 72px;
-        white-space: nowrap;
-        text-align: center;
-    }
-
-    /* ✅ wrap columns (long text) */
-    .col-wrap {
-        white-space: normal;
-        overflow-wrap: anywhere;
-        word-break: break-word;
-    }
-
-    /* optional: make images neat */
-    .visitor-img {
-        width: 70px;
-        height: auto;
-        display: block;
-    }
-
-    /* smaller screens: allow even more wrapping */
-    @media (max-width: 768px) {
-        .visitors-table {
-            min-width: 980px;
+    <style>
+        .card-body.table-responsive {
+            overflow: visible !important;
         }
-    }
-</style>
+    </style>
 
-<main id="main" class="main">
-    <section class="section">
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="card">
+    <main id="main" class="main">
 
-                    <div class="card-body table-responsive">
-                        <div class="d-flex justify-content-between">
-                            <h5 class="card-title">
-                                <nav>
-                                    <ol class="breadcrumb">
-                                        <li class="breadcrumb-item active">Այցելուների ցանկ</li>
-                                    </ol>
-                                </nav>
-                            </h5>
 
-                            @if (!auth()->user()->hasRole('trainer'))
-                            <div class="pull-right d-flex justify-content-end m-3">
-                                <a class="btn btn-primary mb-2" href="{{ route('visitors.create') }}">
-                                    <i class="fa fa-plus"></i> Ստեղծել նոր այցելու
-                                </a>
+
+        <section class="section">
+            <div class="row">
+
+                <div class="col-lg-12">
+                    <div class="card">
+
+                        <div class="card-body table-responsive">
+                            <div class="d-flex justify-content-between">
+                                <h5 class="card-title">
+
+                                    <nav>
+                                        <ol class="breadcrumb">
+                                            <li class="breadcrumb-item active">Այցելուների ցանկ</li>
+
+                                        </ol>
+                                    </nav>
+
+                                </h5>
+                                @if (!auth()->user()->hasRole('trainer'))
+                                    <div class="pull-right d-flex justify-content-end m-3">
+                                        <a class="btn btn-primary  mb-2" href="{{ route('visitors.create') }}"><i
+                                                class="fa fa-plus"></i> Ստեղծել նոր այցելու</a>
+                                    </div>
+                                @endif
                             </div>
+                            @if (session('error'))
+                                <div class="alert alert-danger">
+                                    {{ session('error') }}
+                                </div>
+                            @endif
+                            <!-- Bordered Table -->
+                            @if ($data->total() === 0)
+                                <div class="alert alert-danger">
+                                    Դուք չունեք գրանցված այցելուներ
+                                </div>
+                            @else
+                                <table class="table table-bordered table-sm align-middle text-nowrap">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Հ/Հ</th>
+                                            <th scope="col">ID</th>
+                                            <th scope="col">Նույնականացման կոդ</th>
+                                            <th scope="col">Նկար</th>
+                                            <th scope="col">Անուն</th>
+                                            <th scope="col">Ազգանուն</th>
+                                            <th scope="col">Հեռ․</th>
+                                            <th scope="col">Ստորաբաժանում</th>
+                                            <th scope="col">Մարզիչ</th>
+                                            <th scope="col">Փաթեթ</th>
+                                            <th scope="col">Վերահսկվող</th>
+                                            <th scope="col">Գործողություն</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                        @if($data != null && count($data) > 0)
+                                            @foreach ($data as $person)
+
+                                                                {{-- {{ dump($entry_code->active_person->people->name) }} --}}
+
+                                                                <tr>
+                                                                    <td>{{ ++$i }}</td>
+                                                                    <th scope="row">{{ $person->id }}</th>
+                                                                    <th scope="row">
+                                                                        {{ $person->activated_code_connected_person->entry_code_id ?? null }}</th>
+                                                                    <td>
+
+                                                                        @if($person->image != null)
+                                                                            <img src="{{  route('get-file', ['path' => $person->image]) }}"
+                                                                                style="width:80px">
+
+                                                                        @endif
+
+                                                                    </td>
+                                                                    <td>
+                                                                        {{ $person->name ?? null }}
+
+                                                                    </td>
+                                                                    <td>
+                                                                        {{ $person->surname ?? null }}
+
+                                                                    </td>
+                                                                    <td>
+                                                                        {{ $person->phone ?? null }}
+                                                                    </td>
+                                                                    <td>
+                                                                        {{
+                                                $person->schedule_department_people
+                                                    ->pluck('department.name')
+                                                    ->filter()
+                                                    ->unique()
+                                                    ->implode(', ')
+                                                ?: '—'
+                                                                            }}
+                                                                    </td>
+
+                                                                    <td>
+                                                                        {{ $person->trainer->name ?? null }}
+                                                                    </td>
+                                                                    <td>
+                                                                        {{ $person->package->name ?? null }}
+                                                                    </td>
+                                                                    <td>
+                                                                        {{-- {{ dd($person->activated_code_connected_person) }} --}}
+                                                                        @if($person->activated_code_connected_person != null)
+                                                                            <input type="checkbox" class="supervised" {{ $person->superviced != null ? "checked" : null }} value="{{$person->id}}"
+                                                                                data-client="{{$person->client->id}}" />
+                                                                        @endif
+                                                                    </td>
+
+                                                                    <td>
+
+                                                                        <div class="dropdown action" data-id="{{ $person->id }}" data-tb-name="people">
+                                                                            <button type="button" class="btn p-0 dropdown-toggle hide-arrow"
+                                                                                data-bs-toggle="dropdown">
+                                                                                <i class="bx bx-dots-vertical-rounded"></i>
+                                                                            </button>
+
+                                                                            <div class="dropdown-menu">
+                                                                                {{-- @if(auth()->user()->hasRole('super_admin'))
+                                                                                <a class="dropdown-item d-flex" href="javascript:void(0);">
+                                                                                    <div class="form-check form-switch">
+                                                                                        <input class="form-check-input change_status" type="checkbox"
+                                                                                            role="switch" data-field-name="status" {{
+                                                                                            $entry_code['status'] ? 'checked' : null }}>
+                                                                                    </div>Կարգավիճակ
+                                                                                </a>
+                                                                                @endif
+                                                                                @if(auth()->user()->hasRole('client_admin'))
+                                                                                <a class="dropdown-item d-flex" href="javascript:void(0);">
+                                                                                    <div class="form-check form-switch">
+                                                                                        <input class="form-check-input change_status" type="checkbox"
+                                                                                            role="switch" data-field-name="activation" {{
+                                                                                            $entry_code['activation'] ? 'checked' : null }}>
+                                                                                    </div>Ակտիվացում
+                                                                                </a>
+                                                                                @endif --}}
+
+                                                                                @if ($person != null)
+                                                                                    <a class="dropdown-item" href="{{route('calendar', $person->id)}}">
+                                                                                        <i class="bi bi-calendar-event"></i>Ժամանակացույց
+                                                                                    </a>
+
+                                                                                @endif
+                                                                                <a class="dropdown-item"
+                                                                                    href="{{route('absence.list', $person->id)}}"><i
+                                                                                        class="bi bi-person-x me-1"></i>Հարգելի Բացակա</a>
+
+
+                                                                                <a class="dropdown-item"
+                                                                                    href="{{route('visitors.edit', $person->id)}}"><i
+                                                                                        class="bx bx-edit-alt me-1"></i>Խմբագրել</a>
+                                                                                <button type="button" class="dropdown-item click_delete_item"
+                                                                                    data-bs-toggle="modal" data-bs-target="#smallModal">
+                                                                                    <i class="bx bx-trash me-1"></i>
+                                                                                    Ջնջել</button>
+                                                                            </div>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+
+                                            @endforeach
+                                        @endif
+
+
+                                    </tbody>
+                                </table>
+                            @endif
+
+                            <!-- End Bordered Table -->
+
+                            @if($data != null && count($data) > 0)
+                                <div class="demo-inline-spacing">
+                                    {{ $data->links() }}
+                                </div>
                             @endif
                         </div>
-                        <form method="GET" class="row g-2 align-items-end mb-3">
-                            <div class="col-12 col-md-4">
-                                <label class="form-label mb-1">Անուն / Ազգանուն</label>
-                                <input
-                                    type="text"
-                                    name="q"
-                                    value="{{ request('q') }}"
-                                    class="form-control"
-                                    placeholder="օր․ Արամ / Պետրոսյան">
-                            </div>
-
-                            <div class="col-12 col-md-3">
-                                <label class="form-label mb-1">Բացակայություն</label>
-                                <select name="absence" class="form-select">
-                                    <option value="" {{ request('absence')=='' ? 'selected' : '' }}>Բոլորը</option>
-                                    <option value="has" {{ request('absence')=='has' ? 'selected' : '' }}>Ունի</option>
-                                    <option value="none" {{ request('absence')=='none' ? 'selected' : '' }}>Չունի</option>
-                                </select>
-                            </div>
-
-                            <div class="col-12 col-md-3">
-                                <label class="form-label mb-1">Վճարման կարգավիճակ</label>
-                                <select name="payment" class="form-select">
-                                    <option value="" {{ request('payment')=='' ? 'selected' : '' }}>Բոլորը</option>
-                                    <option value="paid" {{ request('payment')=='paid' ? 'selected' : '' }}>Վճարված </option>
-                                    <option value="pending" {{ request('payment')=='pending' ? 'selected' : '' }}>Չվճարված </option>
-                                </select>
-                            </div>
-
-                            <div class="col-12 col-md-2 d-flex gap-2">
-                                <button class="btn btn-primary w-100" type="submit">Ֆիլտրել</button>
-                                <a class="btn btn-light w-100" href="{{ route('visitors.list') }}">Մաքրել</a>
-                            </div>
-                        </form>
 
 
-                        @if (session('error'))
-                        <div class="alert alert-danger">
-                            {{ session('error') }}
-                        </div>
-                        @endif
-
-                        @if ($data->total() === 0)
-                        <div class="alert alert-danger">
-                            Դուք չունեք գրանցված այցելուներ
-                        </div>
-                        @else
-
-                        <table class="table table-bordered table-sm align-middle visitors-table">
-                            <thead>
-                                <tr>
-                                    <th scope="col" class="col-idx">Հ/Հ</th>
-                                    <th scope="col" class="col-wrap">Անուն</th>
-                                    <th scope="col" class="col-wrap">Ազգանուն</th>
-                                    <th scope="col" class="col-phone">Հեռ․</th>
-                                    <th scope="col" class="col-pay">Վճար․</th>
-                                    <th scope="col" class="col-act">Կ/Վ</th>
-                                </tr>
-                            </thead>
-
-                            <tbody>
-                                @foreach ($data as $person)
-
-                                <tr>
-                                    <td class="col-idx {{ $person->activeAbsences->count() > 0 ? 'idx-red' : '' }}">
-                                        {{ ++$i }}
-                                    </td>
-
-                                    <td class="col-wrap {{ $person->activeAbsences->count() > 0 ? 'idx-red' : '' }}">{{ $person->name ?? '—' }}</td>
-                                    <td class="col-wrap {{ $person->activeAbsences->count() > 0 ? 'idx-red' : '' }}">{{ $person->surname ?? '—' }}</td>
-
-                                    <td class="col-phone {{ $person->activeAbsences->count() > 0 ? 'idx-red' : '' }}">{{ $person->phone ?? '—' }}</td>
-                                    @php
-                                    $hasActivePackage = $person->activeBookings?->count() > 0;
-
-                                    $pay = $person->latestPayment; // կարող է null լինել
-                                    $paid = $pay && $pay->status === 'paid';
-
-                                    $payClass = $hasActivePackage
-                                    ? ($paid ? 'pay-green' : 'pay-red')
-                                    : 'pay-red';
-
-                                    $methodMap = [
-                                    'cash' => 'Կանխիկ',
-                                    'cashless' => 'Անկանխիկ',
-                                    'credit' => 'Կրեդիտ',
-                                    ];
-
-                                    $methodText = $pay ? ($methodMap[$pay->payment_method] ?? $pay->payment_method) : '—';
-                                    $bankText = ($pay && $pay->payment_bank) ? ' / ' . $pay->payment_bank : '';
-                                    @endphp
-
-                                    <td class="col-pay {{ $payClass }}">
-                                        @if(!$hasActivePackage)
-                                        {{ $methodText }}{!! $bankText ? "<span class='text-muted'>{$bankText}</span>" : "" !!}
-                                        @else
-                                        {{ $methodText }}{!! $bankText ? "<span class='text-muted'>{$bankText}</span>" : "" !!}
-                                        @endif
-                                    </td>
-
-
-                                    <!-- <td class="col-super">
-                                        @if($person->activated_code_connected_person)
-                                        <input
-                                            type="checkbox"
-                                            class="supervised"
-                                            {{ $person->superviced != null ? 'checked' : '' }}
-                                            value="{{ $person->id }}"
-                                            data-client="{{ $person->client->id }}" />
-                                        @else
-                                        —
-                                        @endif
-                                    </td> -->
-
-
-                                    <td class="col-act">
-                                        <div class="dropdown">
-                                            <button
-                                                class="btn p-0 dropdown-toggle hide-arrow"
-                                                type="button"
-                                                data-bs-toggle="dropdown"
-                                                data-bs-container="body"
-                                                data-bs-boundary="viewport"
-                                                aria-expanded="false">
-                                                <i class="bx bx-dots-vertical-rounded"></i>
-                                            </button>
-
-                                            <ul class="dropdown-menu dropdown-menu-end shadow">
-                                                <li>
-                                                    <a class="dropdown-item" href="{{ route('calendar', $person->id) }}">
-                                                        Ժամանակացույց
-                                                    </a>
-                                                </li>
-                                                <li>
-                                                    <a class="dropdown-item" href="{{ route('absence.list', $person->id) }}">
-                                                        Հարգելի բացակա
-                                                    </a>
-                                                </li>
-                                                <li>
-                                                    <a class="dropdown-item" href="{{ route('visitors.edit', $person->id) }}">
-                                                        Խմբագրել
-                                                    </a>
-                                                </li>
-                                                <li>
-                                                    <button
-                                                        type="button"
-                                                        class="dropdown-item click_delete_item"
-                                                        data-bs-toggle="modal"
-                                                        data-bs-target="#smallModal">
-                                                        Ջնջել
-                                                    </button>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </td>
-
-
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-
-                        <div class="demo-inline-spacing">
-                            {{ $data->links() }}
-                        </div>
-
-                        @endif
                     </div>
+
+
+
+
+
                 </div>
+
             </div>
-        </div>
-    </section>
-</main>
 
-<script>
-    $('.supervised').on('change', function() {
-        let isChecked = $(this).prop("checked") ? 1 : 0;
-        let people_id = $(this).val();
-        let client_id = $(this).attr('data-client');
+        </section>
 
-        if (isChecked) {
-            $.ajax({
-                type: "POST",
-                url: '/supervised',
-                data: {
-                    people_id,
-                    client_id
-                },
-                cache: false
-            });
-        } else {
-            $.ajax({
-                type: "POST",
-                url: '/delete-superviced',
-                data: {
-                    people_id,
-                    client_id
-                },
-                cache: false
-            });
-        }
-    });
-</script>
+    </main><!-- End #main -->
+    <script>
+        $('.supervised').on('change', function () {
+
+            // alert(7777)
+            let isChecked = $(this).prop("checked") ? 1 : 0;
+            console.log(isChecked)
+            let people_id = $(this).val()
+            let client_id = $(this).attr('data-client')
+            if (isChecked) {
+
+                $.ajax({
+                    type: "POST",
+                    url: '/supervised',
+                    data: {
+                        people_id: people_id,
+                        client_id: client_id
+                    },
+                    cache: false,
+                    success: function (data) {
+                        if (data.success) {
+
+                        } else {
+                            message = data.message
+
+                        }
+                    }
+                });
+
+            } else {
+                console.log(people_id, client_id)
+
+                $.ajax({
+                    type: "POST",
+                    url: '/delete-superviced',
+                    data: {
+                        people_id: people_id,
+                        client_id: client_id
+                    },
+                    cache: false,
+                    success: function (data) {
+                        if (data.success) {
+
+                        } else {
+                            message = data.message
+
+                        }
+                    }
+                });
+
+
+            }
+        })
+    </script>
 
 @endsection
 
