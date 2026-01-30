@@ -87,10 +87,43 @@ class Person extends Model
     {
         return $this->hasMany(PersonSessionBooking::class);
     }
+
+    public function payments()
+    {
+        return $this->hasMany(PersonPayment::class);
+    }
+    public function latestPayment(): HasOne
+    {
+        return $this->hasOne(PersonPayment::class, 'person_id')->latestOfMany();
+    }
+
+    // ակտիվ փաթեթ/աբոնեմենտ՝ ըստ booking-ի session_start_time / session_end_time
+    public function activeBookings(): HasMany
+    {
+        return $this->hasMany(PersonSessionBooking::class, 'person_id')
+            ->whereDate('session_start_time', '<=', Carbon::today())
+            ->whereDate('session_end_time', '>=', Carbon::today())
+            ->whereHas('person.latestPayment', function ($q) {
+                $q->where('status', ['paid']);
+            });
+    }
+
+        public function activeBookingsForFilter(): HasMany
+    {
+        return $this->hasMany(PersonSessionBooking::class, 'person_id');
+       
+
+    }
+
+  public function latestBooking(): HasOne
+    {
+        return $this->hasOne(PersonSessionBooking::class, 'person_id')->latestOfMany();
+    }
+
     public function recommendations()
+
     {
         return $this->belongsToMany(Recommendation::class,'person_recommendation')->withTimestamps();
     }
 
-    ////////
 }
