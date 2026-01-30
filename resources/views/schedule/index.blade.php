@@ -111,7 +111,7 @@
                                                         @endif
                                                         @if ($user->hasAnyRole([ 'trainer']))
                                                             <a class="dropdown-item" href="{{route('schedule-calendar',$item['id'] )}}"><i
-                                                            class="bx bx-edit-alt me-1"></i>Գրանցված այցելուներ</a>
+                                                            class="bi bi-person me-1"></i>Գրանցված այցելուներ</a>
 
                                                         @endif
                                                         @if (!auth()->user()->hasRole('client_admin_rfID'))
