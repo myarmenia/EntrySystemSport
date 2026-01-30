@@ -91,4 +91,6 @@ class Person extends Model
     {
         return $this->belongsToMany(Recommendation::class,'person_recommendation')->withTimestamps();
     }
+
+    ////////
 }
