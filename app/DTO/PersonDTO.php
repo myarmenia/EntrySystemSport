@@ -37,6 +37,7 @@ class PersonDTO
         $this->trainer_id = $trainer_id;
         $this->session_duration_id = $session_duration_id;
         $this->change_package = $change_package;
+        
     }
 
     public static function fromModel($person)
