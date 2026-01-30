@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                     <ol class="breadcrumb">
                                         <li class="breadcrumb-item"><a href="{{ route('recommendation.list') }}">Մարզչի խորհուրդներ</a></li>
 
-                                            <li class="breadcrumb-item active">Ստեղծել </li>
+                                            <li class="breadcrumb-item active">Խմբագրել</li>
                                         </ol>
                                     </nav>
                                 </h5>
@@ -96,7 +96,7 @@ document.addEventListener('DOMContentLoaded', function () {
             <div class="row mb-3" id="loginBtn">
                 <label class="col-sm-2 col-form-label"></label>
                 <div class="col-sm-10">
-                    <button type="submit" class="btn btn-primary">Ստեղծել</button>
+                    <button type="submit" class="btn btn-primary">Պահպանել</button>
                 </div>
             </div>
 
