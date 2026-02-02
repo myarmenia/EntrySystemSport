@@ -46,6 +46,13 @@
                 </span>
             </a>
         </li>
+        <li class="nav-item">
+            <a class="nav-link {{ Route::is(['schedule.list', 'schedule.create', 'schedule.edit']) ? '' : 'collapsed' }}"
+                href="{{ route('schedule.work-time-list') }}">
+                <i class="bi bi-calendar-event"></i>
+                <span>Ժամանակացույց</span>
+            </a>
+        </li>
         @endif
         @if ($user->hasRole(['client_sport']))
         <li class="nav-item">

@@ -42,6 +42,7 @@ use App\Http\Controllers\Schedule\ScheduleDetailsController;
 use App\Http\Controllers\Supervised\SupervicedController;
 use App\Http\Controllers\TrainerScheduleVisitorsCalendarController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\WorkTimeManagment\WorkTimeManagmentController;
 use App\Services\FileUploadService;
 use Illuminate\Support\Facades\Route;
 
@@ -153,7 +154,10 @@ Route::group(['middleware' => ['auth']], function () {
         Route::post('store', [ScheduleController::class, 'storeScheduleName'])->name('schedule.store');
         Route::get('{id}/edit/', [ScheduleController::class, 'edit'])->name('schedule.edit');
         Route::put('{id}/', [ScheduleController::class, 'update'])->name('schedule.update');
+        Route::get('work-time-list',[WorkTimeManagmentController::class,'index'])->name('schedule.work-time-list');
+         Route::get('work-time-create',[WorkTimeManagmentController::class,'create'])->name('schedule.work-time-create');
     });
+
     Route::group(['prefix' => 'package'], function () {
         Route::get('list', [PackageController::class, 'index'])->name('package.list');
         Route::get('create', [PackageController::class, 'create'])->name('package.create');

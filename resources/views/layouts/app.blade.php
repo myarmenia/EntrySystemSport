@@ -40,6 +40,7 @@
     <link href="{{ asset('assets/css/style.css') }}" rel="stylesheet">
     {{-- added template links end --}}
 
+
     @yield("page-script")
 
     <!-- Scripts -->
@@ -49,6 +50,7 @@
         'resources/js/app.js'
     ])
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+     @yield("style")
 
 </head>
 
@@ -75,7 +77,7 @@
 
     <!-- Template Main JS File -->
     <script src="{{ asset('assets/js/main.js') }}"></script>
-     
+
 
     {{-- added template js end --}}
 </body>
