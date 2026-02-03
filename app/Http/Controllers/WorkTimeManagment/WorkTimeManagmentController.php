@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\WorkTimeManagment;
 
+use App\Helpers\MyHelper;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
@@ -13,6 +14,8 @@ class WorkTimeManagmentController extends Controller
     }
     public function create(){
 
-        return view('work-time-managment.create');
+        $weekdays =MyHelper::week_days();
+
+        return view('work-time-managment.create',compact('weekdays'));
     }
 }

@@ -85,10 +85,10 @@ class ScheduleController extends Controller
 
     public function update(Request $request, $id)
     {
-        // dd($request->all());
+        dd($request->all());
         // dd(ScheduleNameDto::fromRequestDto($request));
         $data = $this->service->updateScheduleName(ScheduleNameDto::fromRequestDto($request), $id);
 
-        return redirect()->back();
+        // return redirect()->back();
     }
 }
