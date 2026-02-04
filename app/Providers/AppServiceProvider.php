@@ -10,6 +10,7 @@ use App\Interfaces\CheckEntryCodeInterface;
 use App\Interfaces\ClientIdFromTurnstileInterface;
 use App\Interfaces\CreateEntryCodeInterface;
 use App\Interfaces\DepartmentInterface;
+use App\Interfaces\WorkTimeManagmentInterface;
 use App\Repositories\AbsenceRepository;
 use App\Repositories\AttendanceSheetRepository;
 use App\Repositories\AttendanceSheetTimeRepository;
@@ -28,6 +29,7 @@ use App\Repositories\ScheduleDetailsRepository;
 use App\Repositories\ScheduleNameRepository;
 use App\Repositories\TurnstileRepository;
 use App\Repositories\UserRepository;
+use App\Repositories\WorkTimeManagmentRepository;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\ServiceProvider;
 use Carbon\Carbon;
@@ -53,6 +55,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(AbsenceInterface::class, AbsenceRepository::class);
         $this->app->bind(AttendanceSheetTimeInterface::class, AttendanceSheetTimeRepository::class);
         $this->app->bind(DiscountRepositoryInterface::class, DiscountRepository::class);
+        $this->app->bind(WorkTimeManagmentInterface::class,WorkTimeManagmentRepository::class);
     }
 
     /**

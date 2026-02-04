@@ -1,0 +1,25 @@
+<?php
+namespace App\Interfaces;
+
+use App\Models\ScheduleName;
+
+interface WorkTimeManagmentInterface
+{
+    public function createScheduleName(string $name): ScheduleName;
+
+    public function attachClient(
+        int $clientId,
+        int $scheduleNameId
+    ): void;
+
+    public function createScheduleDetail(
+        int $scheduleNameId,
+        array $dayData
+    ): void;
+
+    public function createSmokeBreak(
+        int $clientId,
+        int $scheduleNameId,
+        array $smoke
+    ): void;
+}

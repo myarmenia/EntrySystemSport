@@ -66,20 +66,16 @@
                         </div>
 
                         @if(auth()->user()->hasAnyRole(['client_admin',"client_admin_rfID","client_sport"]))
-                        <div class="row mb-3">
-                            <label class="col-sm-3 col-form-label">Ակտիվացում </label>
-                            <div class="col-sm-9">
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox"
-                                        name="status">
+                            <div class="row mb-3">
+                                <label class="col-sm-3 col-form-label">Ակտիվացում </label>
+                                <div class="col-sm-9">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox"
+                                            name="status">
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-
-
-
-
-                    @endif
+                        @endif
                     <div class="row mt-3">
                         <label class="col-sm-3 col-form-label"></label>
                         <div class="col-sm-9">

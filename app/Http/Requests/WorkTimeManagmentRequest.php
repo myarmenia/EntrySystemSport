@@ -38,7 +38,7 @@ class WorkTimeManagmentRequest extends FormRequest
                 }
 
                 if (!$validDayExists) {
-                    $fail('Խնդրում ենք լրացնել առնվազն մեկ օրվա սկիզբը և ավարտը։');
+                    $fail('Խնդրում ենք լրացնել առնվազն մեկ օրվա ժամի սկիզբը և ավարտը։');
                 }
             }],
         ];

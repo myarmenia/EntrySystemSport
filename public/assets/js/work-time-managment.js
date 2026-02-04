@@ -73,6 +73,7 @@ $(document).ready(function () {
 let count = 0
     $(document).on('click', '.smoke-time', function () {
         count++;
+        console.log(count)
         let key = $(this).attr('data-key')
         let container_smoke = $(this)
             .closest('.day-row')
@@ -91,14 +92,14 @@ let count = 0
                                                         <label class="form-label small">Սկիզբ</label>
                                                         <input type="time"
                                                                class="form-control smoke-start"
-                                                                name="week_days[${key }][smoke_break][smoke_start_time]"
+                                                                name="week_days[${key }][smoke_break][${count}][smoke_start_time]"
                                                                >
                                                     </div>
                                                     <div class="col-3" >
                                                         <label class="form-label small">Ավարտ</label>
                                                         <input type="time"
                                                                class="form-control smoke-end"
-                                                               name="week_days[${key }][smoke_end_time]"
+                                                               name="week_days[${key }][smoke_break][${count}][smoke_end_time]"
                                                                >
                                                     </div>
                                                     <div class="col-1 mt-4 " >
