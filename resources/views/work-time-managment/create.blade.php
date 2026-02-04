@@ -44,34 +44,43 @@
                     <div class="col-lg-12">
                         <div class="row">
                             <!-- Reports -->
-                            <div class="col-12">
+                            <div class="col-8">
 
                                 <div class="card">
                                     <div class="card-body">
                                         <div class="row mt-3">
-                                            <div class="col-12">
+                                            <div>
                                                 <label for="inputCity" class="form-label ">Անվանում</label>
                                                 <input type="text"
                                                         name="name"
                                                         class="form-control"
                                                         id="name"
                                                         >
+                                                @error("name")
+                                                    <div class="mb-3 row ">
+                                                        <p class="col-sm-10 text-danger fs-6">{{ $message }}
+                                                        </p>
+                                                    </div>
+                                                @enderror
                                             </div>
 
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="pagetitle d-flex justify-content-end align-items-center">
+                            <div class=" col-8 pagetitle d-flex justify-content-end">
                                 <a c href="javascript:void(0)" id="applyToAll">Տարածել շաբաթվա բոլոր օրերի վրա</a>
                             </div>
+                            @error('week_days')
+                                <div class="col-8 alert alert-danger mt-2">{{ $message }}</div>
+                            @enderror
                             @foreach ($weekdays  as $key => $week )
-                                <div class="col-12">
+                                <div class="col-8">
                                     <div class="card">
                                         <div class="card-body">
                                             <div class="row mt-3 day-row" data-day="{{ $week }}">
                                                 <div class="d-flex justify-content-between">
-                                                    <h6 class="fw-bold">Երեքշաբթի{{ $week }}</h6>
+                                                    <h6 class="fw-bold">{{ $week }}</h6>
                                                     <input type="hidden" name="week_days[{{ $key }}][week_day]" value="{{ $week }}">
                                                 </div>
 
@@ -95,25 +104,38 @@
                                                             placeholder="09:00">
                                                     </div>
                                                 </div>
-                                                <div class="col-md-4">
-                                                    <label for="breaks" class="form-label">Ընդմիջում</label>
-                                                    <div class="d-flex gap-2 mt-2">
+                                               <div class="col-md-4">
+                                                    <label class="form-label">Ընդմիջում</label>
+
+                                                    <div class="d-flex gap-2">
                                                         <button type="button"
-                                                                class="btn btn-sm mb-2 break-time"
+                                                                class="btn btn-sm mb-2 break-time d-flex align-items-center justify-content-center gap-2 flex-fill"
                                                                 data-key="{{ $key }}"
-                                                                style="background: rgba(220, 252, 231, 1); color: #28a745; font-weight: 600;">
-                                                            <i class="fa-solid fa-utensils"></i> 14:00
+                                                                style="
+                                                                    border-radius:8px;
+                                                                    padding:8px 14px;
+                                                                    background: rgba(220, 252, 231, 1);
+                                                                    color: #28a745;
+                                                                    font-weight: 600;
+                                                                ">
+                                                            <i class="fa-solid fa-utensils"></i>Ընդմիջման ժամ
                                                         </button>
-                                                        <!-- Smoking break / ծխելու ընդմիջում -->
+
                                                         <button type="button"
-                                                                class="btn btn-sm mb-2 smoke-time"
+                                                                class="btn btn-sm mb-2 smoke-time d-flex align-items-center justify-content-center gap-2 flex-fill"
                                                                 data-key="{{ $key }}"
-                                                                style="background: rgba(254, 243, 198, 1); color: #ffc107; font-weight: 600;">
-                                                            <i class="fa-solid fa-smoking"></i> 13:00
+                                                                style="
+                                                                    border-radius:8px;
+                                                                    padding:8px;
+                                                                    background: rgba(254, 243, 198, 1);
+                                                                    color: #ffc107;
+                                                                    font-weight: 600;
+                                                                ">
+                                                            <i class="fa-solid fa-smoking"></i> Ծխելու ժամ
                                                         </button>
-                                                        </div>
+                                                    </div>
                                                 </div>
-                                                <div class="col-md-12 break-time-container mt-2">
+                                                <div class="col-md-12 break-time-container mt-3">
 
                                                 </div>
                                                 <div class="col-md-12 smoking-time-container mt-2">
@@ -140,3 +162,4 @@
         </form>
     </main>
 @endsection
+<x-work-time-alert-modal/>

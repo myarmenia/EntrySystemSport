@@ -8,6 +8,10 @@ $(document).ready(function () {
         let startTime = $monday.find('.start-time').val();
         let endTime   = $monday.find('.end-time').val();
         console.log(startTime,"startTime",endTime)
+        if(startTime=='' && endTime==''){
+            $(this).attr('data-bs-toggle', 'modal');
+            $(this).attr('data-bs-target', '#smallModal');
+        }
 
         // loop all days
         $('.day-row').each(function () {
@@ -39,34 +43,37 @@ $(document).ready(function () {
 
         let html =
             `   <div class="row g-2 p-2  break-time-block justify-content-center align-items-center"  style="background: rgba(220, 252, 231, 1); border:1px solid #28a745;border-radius:8px;">
-                                                     <div class="col-3">
+                                                     <div class="col-4">
                                                          <button type="button" class="btn btn-sm mb-2"
                                                         style="background: rgba(220, 252, 231, 1);">
-                                                        <i class="fa-solid fa-utensils"></i> 14:00
+                                                        <i class="fa-solid fa-utensils"></i> Ընդմիջման ժամ
                                                     </button>
                                                      </div>
                                                     <div class="col-3">
                                                         <label class="form-label small">Սկիզբ</label>
                                                         <input type="time"
-                                                            name="week_days[${$key }][break_start_time]"
+                                                            name="week_days[${key }][break_start_time]"
                                                             class="form-control break-start">
                                                     </div>
                                                     <div class="col-3" >
                                                         <label class="form-label small">Ավարտ</label>
                                                         <input type="time"
-                                                                name="week_days[${$key }][break_end_time]"
+                                                                name="week_days[${key }][break_end_time]"
                                                                 class="form-control break-end"
                                                          >
                                                     </div>
-                                                    <div class="col-3 text-center " >
-                                                        <a class="text-danger delate fw-bold">x</a>
+                                                    <div class="col-1 mt-4 " >
+                                                        <a class="text-danger delate fw-bold ms-3" style="cursor: pointer;">x</a>
                                                     </div>
                                                 </div>`;
 
         container.html(html)
     });
 // ============ smoking-time ===================
+let count = 0
     $(document).on('click', '.smoke-time', function () {
+        count++;
+        let key = $(this).attr('data-key')
         let container_smoke = $(this)
             .closest('.day-row')
             .find('.smoking-time-container');
@@ -74,22 +81,28 @@ $(document).ready(function () {
 
         let html =
             `<div class="row g-2 p-2 mt-2 smoking-time-block justify-content-center align-items-center"  style="background: rgba(254, 243, 198, 1); border:1px solid #ffc107;border-radius:8px;">
-                                                     <div class="col-3">
+                                                     <div class="col-4">
                                                          <button type="button" class="btn btn-sm mb-2"
                                                         style="background: rgba(254, 243, 198, 1);">
-                                                        <i class="fa-solid fa-smoking"></i> 14:00
+                                                        <i class="fa-solid fa-smoking"></i> Ծխելու ժամ
                                                     </button>
                                                      </div>
                                                     <div class="col-3">
                                                         <label class="form-label small">Սկիզբ</label>
-                                                        <input type="time" class="form-control break-start">
+                                                        <input type="time"
+                                                               class="form-control smoke-start"
+                                                                name="week_days[${key }][smoke_break][smoke_start_time]"
+                                                               >
                                                     </div>
                                                     <div class="col-3" >
                                                         <label class="form-label small">Ավարտ</label>
-                                                        <input type="time" class="form-control break-end">
+                                                        <input type="time"
+                                                               class="form-control smoke-end"
+                                                               name="week_days[${key }][smoke_end_time]"
+                                                               >
                                                     </div>
-                                                    <div class="col-3 text-center " >
-                                                        <a class="text-danger fw-bold delate">x</a>
+                                                    <div class="col-1 mt-4 " >
+                                                        <a class="text-danger delate fw-bold ms-3" style="cursor: pointer;">x</a>
                                                     </div>
                                                 </div>`;
 
