@@ -1,21 +1,22 @@
 <?php
 
 namespace App\DTO;
+use Illuminate\Http\Request;
 
 class WorkTimeManagmentDto
 {
     public function __construct(
         public string $name,
-        public ?int $status,
+        public ?int $status = null,
         public array $weekDays
     ) {}
 
-    public static function fromRequest(array $data): self
+    public static function fromRequest(Request $request): self
     {
         return new self(
-            name: $data['name'],
-            status: array_key_exists('status', $data) ? 1 : 0,
-            weekDays: $data['week_days']
+            name: $request->name,
+            status: $request->has('status') ? 1 : 0,
+            weekDays: $request->week_days
         );
     }
 }

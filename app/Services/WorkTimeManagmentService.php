@@ -13,11 +13,12 @@ class WorkTimeManagmentService
      public function store(
         WorkTimeManagmentDto $dto,
         int $clientId
-    ): void {
+    ): void
+    {
         DB::transaction(function () use ($dto, $clientId) {
 
             $schedule = $this->repository
-                ->createScheduleName($dto->name);
+                ->createScheduleName($dto->name,$dto->status);
 
             $this->repository
                 ->attachClient($clientId, $schedule->id);

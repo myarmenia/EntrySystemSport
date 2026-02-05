@@ -11,9 +11,10 @@ use App\Models\ScheduleDetails;
 
 class WorkTimeManagmentRepository implements WorkTimeManagmentInterface
 {
-    public function createScheduleName(string $name): ScheduleName
+    public function createScheduleName(string $name, int $status ): ScheduleName
     {
-        return ScheduleName::create(['name' => $name]);
+    
+        return ScheduleName::create(['name' => $name,'status' => $status ]);
     }
 
     public function attachClient(int $clientId, int $scheduleNameId): void

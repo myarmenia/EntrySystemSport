@@ -48,7 +48,7 @@
 
                                 <div class="card">
                                     <div class="card-body">
-                                        <div class="row mt-3">
+                                        <div class="row  mt-3" >
                                             <div>
                                                 <label for="inputCity" class="form-label ">Անվանում</label>
                                                 <input type="text"
@@ -67,10 +67,10 @@
 
                                         </div>
                                          @if(auth()->user()->hasAnyRole(['client_admin',"client_admin_rfID","client_sport"]))
-                                            <div class="row mb-3">
-                                                <label class="col-sm-3 col-form-label">Ակտիվացում </label>
-                                                <div class="col-sm-9">
-                                                    <div class="form-check form-switch">
+                                            <div class="row mb-3 col-6 d-flex align-items-center gap-2">
+                                                <label class="col-4 col-form-label">Ակտիվացում </label>
+                                                <div class="col-1">
+                                                    <div class="form-check form-switch" >
                                                         <input class="form-check-input" type="checkbox"
                                                             name="status">
                                                     </div>
@@ -80,8 +80,10 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class=" col-8 pagetitle d-flex justify-content-end">
-                                <a c href="javascript:void(0)" id="applyToAll">Տարածել շաբաթվա բոլոր օրերի վրա</a>
+                            <div class=" col-8 pagetitle d-flex justify-content-end  ">
+                                <a  id="copyToOthersBtn" class="d-none"  href="javascript:void(0)"
+                                 {{-- id="applyToAll" --}}
+                                 >Տարածել շաբաթվա բոլոր օրերի վրա</a>
                             </div>
                             @error('week_days')
                                 <div class="col-8 alert alert-danger mt-2">{{ $message }}</div>

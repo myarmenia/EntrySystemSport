@@ -19,18 +19,15 @@ class WorkTimeManagmentController extends Controller
     }
     public function create(): View{
 
-        $weekdays =MyHelper::week_days();
+        $weekdays = MyHelper::week_days();
 
         return view('work-time-managment.create',compact('weekdays'));
     }
     public function store(WorkTimeManagmentRequest $request){
-dd($request->all());
-        $dto = WorkTimeManagmentDto::fromRequest(
-        $request->validated());
+
+        $dto = WorkTimeManagmentDto::fromRequest($request);
 
         $client_id = MyHelper::find_auth_user_client();
-dd($dto);
-
         $data = $this->service->store($dto,  $client_id);
         return redirect()->route('schedule.work-time-list');
     }

@@ -115,5 +115,54 @@ let count = 0
         $(this).closest('.row').remove();
 
      })
+// ================================
+    document.addEventListener('input', function (e) {
+        alert(1)
+
+            // լսում ենք միայն start / end input-ները
+            if (!e.target.matches('.start-time, .end-time')) {
+                return;
+            }
+
+            const dayRow = e.target.closest('.day-row');
+            console.log(dayRow)
+
+            // եթե տվյալ օրը լրացված է
+            if (isDayFilled(dayRow)) {
+                console.log('Օրը լրացված է ✅');
+            }
+
+            checkFilledDays(); // ստուգում ենք՝ քանի օր է լրացված
+        });
+
+        // ստուգում է՝ մեկ օրը լրացված է, թե ոչ
+        function isDayFilled(dayRow) {
+            const start = dayRow.querySelector('.start-time')?.value;
+            const end   = dayRow.querySelector('.end-time')?.value;
+
+            return !!(start && end);
+        }
+
+        // հաշվում է՝ քանի օր է լրացված
+        function checkFilledDays() {
+            let filledCount = 0;
+            console.log('checkFilledDays')
+
+            document.querySelectorAll('.day-row').forEach(row => {
+                if (isDayFilled(row)) {
+                    filledCount++;
+                    console.log(filledCount)
+                }
+            });
+
+            const btn = document.getElementById('copyToOthersBtn');
+            console.log(btn)
+
+            if (filledCount >= 1) {
+                btn.classList.remove('d-none');
+            } else {
+                btn.classList.add('d-none');
+            }
+        }
 
 });
