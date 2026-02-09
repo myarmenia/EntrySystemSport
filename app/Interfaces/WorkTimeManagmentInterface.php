@@ -20,6 +20,7 @@ interface WorkTimeManagmentInterface
     public function createSmokeBreak(
         int $clientId,
         int $scheduleNameId,
+        string $day,
         array $smoke
     ): void;
 }

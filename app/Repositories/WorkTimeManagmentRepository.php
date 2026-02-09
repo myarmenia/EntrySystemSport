@@ -13,7 +13,7 @@ class WorkTimeManagmentRepository implements WorkTimeManagmentInterface
 {
     public function createScheduleName(string $name, int $status ): ScheduleName
     {
-    
+
         return ScheduleName::create(['name' => $name,'status' => $status ]);
     }
 
@@ -40,11 +40,13 @@ class WorkTimeManagmentRepository implements WorkTimeManagmentInterface
     public function createSmokeBreak(
         int $clientId,
         int $scheduleNameId,
+        string $day,
         array $smoke
     ): void {
         ClientScheduleSmoke::create([
             'client_id' => $clientId,
             'schedule_name_id' => $scheduleNameId,
+            'week_day' => $day,
             'smoke_start_time' => $smoke['smoke_start_time'] ?? null,
             'smoke_end_time' => $smoke['smoke_end_time'] ?? null,
         ]);

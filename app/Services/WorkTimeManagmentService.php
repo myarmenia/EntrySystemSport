@@ -24,6 +24,7 @@ class WorkTimeManagmentService
                 ->attachClient($clientId, $schedule->id);
 
             foreach ($dto->weekDays as $day) {
+          
 
                 if (!empty($day['day_start_time']) && !empty($day['day_end_time'])) {
                     $this->repository
@@ -36,6 +37,7 @@ class WorkTimeManagmentService
                             ->createSmokeBreak(
                                 $clientId,
                                 $schedule->id,
+                                $day['week_day'],
                                 $smoke
                             );
                     }

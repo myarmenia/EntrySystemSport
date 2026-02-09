@@ -13,11 +13,24 @@
 
       <!-- Modal Body -->
       <div class="modal-body text-center py-4">
-        <p class="mb-3 fs-6">
-          Խնդրում ենք լրացնել աշխատանքային ժամի սկիզբը և ավարտը նախքան շարունակելը:
-        </p>
-        <div class="message_cont"></div>
+        <div class="d-flex flex-wrap gap-2" id="weekDaysSelector">
+            @foreach($weekdays as $key => $day)
+                <div
+                    class="week-day-item px-3 py-2 rounded border text-center user-select-none"
+                    data-day="{{ $key }}"
+                    style="cursor:pointer"
+                >
+                    {{ $day }}
+                </div>
+            @endforeach
+        </div>
+
+        <!-- Apply button -->
+        <div class="mt-3">
+            <button type="button" class="btn btn-primary" id="applyDays">Տարածել</button>
+        </div>
       </div>
+
     </div>
   </div>
 </div>

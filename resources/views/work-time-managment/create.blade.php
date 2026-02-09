@@ -1,6 +1,6 @@
 @extends('layouts.app')
 @section('page-script')
-    <script src="{{ asset('assets/js/work-time-managment.js') }}"></script>
+    <script src="{{ asset('assets/js/work-time-managment1.js') }}"></script>
 @endsection
 {{-- @section('style')
 <style>
@@ -81,7 +81,12 @@
                                 </div>
                             </div>
                             <div class=" col-8 pagetitle d-flex justify-content-end  ">
-                                <a  id="copyToOthersBtn" class="d-none"  href="javascript:void(0)"
+                                <a  id="copyToOthersBtn"
+                                    class="d-none"
+                                    href="javascript:void(0)"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#smallModal"
+
                                  {{-- id="applyToAll" --}}
                                  >Տարածել շաբաթվա բոլոր օրերի վրա</a>
                             </div>
@@ -92,7 +97,7 @@
                                 <div class="col-8">
                                     <div class="card">
                                         <div class="card-body">
-                                            <div class="row mt-3 day-row" data-day="{{ $week }}">
+                                            <div class="row mt-3 day-row" data-day="{{ $key }}">
                                                 <div class="d-flex justify-content-between">
                                                     <h6 class="fw-bold">{{ $week }}</h6>
                                                     <input type="hidden" name="week_days[{{ $key }}][week_day]" value="{{ $week }}">
@@ -176,4 +181,4 @@
         </form>
     </main>
 @endsection
-<x-work-time-alert-modal/>
+<x-work-time-alert-modal :weekdays="$weekdays" />

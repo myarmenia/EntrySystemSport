@@ -117,7 +117,6 @@ let count = 0
      })
 // ================================
     document.addEventListener('input', function (e) {
-        alert(1)
 
             // լսում ենք միայն start / end input-ները
             if (!e.target.matches('.start-time, .end-time')) {
@@ -130,6 +129,7 @@ let count = 0
             // եթե տվյալ օրը լրացված է
             if (isDayFilled(dayRow)) {
                 console.log('Օրը լրացված է ✅');
+                // console.log(dayRow,444)
             }
 
             checkFilledDays(); // ստուգում ենք՝ քանի օր է լրացված
@@ -163,6 +163,38 @@ let count = 0
             } else {
                 btn.classList.add('d-none');
             }
+
+             const modalEl = document.getElementById('smallModal');
+             const modal = new bootstrap.Modal(modalEl);
+
+                btn.addEventListener('click', function () {
+                    modal.show();
+                });
         }
+
+        let selectedDays = [];
+
+document.addEventListener('click', function (e) {
+    const item = e.target.closest('.week-day-item');
+    if (!item) return;
+
+    const day = item.dataset.day;
+
+    // toggle bootstrap classes
+    item.classList.toggle('bg-primary');
+    item.classList.toggle('text-white');
+    item.classList.toggle('border-primary');
+
+    if (item.classList.contains('bg-primary')) {
+        if (!selectedDays.includes(day)) {
+            selectedDays.push(day);
+        }
+    } else {
+        selectedDays = selectedDays.filter(d => d !== day);
+    }
+
+    console.log(selectedDays);
+});
+
 
 });

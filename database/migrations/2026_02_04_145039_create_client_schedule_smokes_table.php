@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('client_id')->constrained('clients')->cascadeOnDelete();
             $table->foreignId('schedule_name_id')->constrained('schedule_names')->cascadeOnDelete();
+            $table->string('week_day')->nullable();
             $table->time('smoke_start_time')->nullable();
             $table->time('smoke_end_time')->nullable();
             $table->timestamps();
