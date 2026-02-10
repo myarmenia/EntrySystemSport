@@ -64,6 +64,15 @@
                                                     </div>
                                                 @enderror
                                             </div>
+                                            @if ($errors->any())
+                                                <div class="alert alert-danger">
+                                                    <ul class="mb-0">
+                                                        @foreach ($errors->all() as $er=>$error)
+                                                            <li>{{ $error }}</li>
+                                                        @endforeach
+                                                    </ul>
+                                                </div>
+                                            @endif
 
                                         </div>
                                          @if(auth()->user()->hasAnyRole(['client_admin',"client_admin_rfID","client_sport"]))
@@ -90,16 +99,27 @@
                                  {{-- id="applyToAll" --}}
                                  >Տարածել շաբաթվա բոլոր օրերի վրա</a>
                             </div>
-                            @error('week_days')
+                            @error('week_days.0')
                                 <div class="col-8 alert alert-danger mt-2">{{ $message }}</div>
                             @enderror
+                            @php
+                                $items_errors = old("week_days",[]);
+                                // print_r($items_errors);
+                            @endphp
                             @foreach ($weekdays  as $key => $week )
+
                                 <div class="col-8">
                                     <div class="card">
                                         <div class="card-body">
                                             <div class="row mt-3 day-row" data-day="{{ $key }}">
                                                 <div class="d-flex justify-content-between">
                                                     <h6 class="fw-bold">{{ $week }}</h6>
+                                                  @error('week_days.'.$key)
+                                                                    <div class="text-danger small mt-1">
+                                                                    {{ $message }}11111111118
+                                                                </div>
+                                                            @enderror
+
                                                     <input type="hidden" name="week_days[{{ $key }}][week_day]" value="{{ $week }}">
                                                 </div>
 
@@ -156,8 +176,90 @@
                                                 </div>
                                                 <div class="col-md-12 break-time-container mt-3">
 
+                                                    @if(array_key_exists($key, $items_errors))
+
+                                                        @if (( array_key_exists('break_start_time', $items_errors[$key])) ||
+                                                            (array_key_exists('break_end_time', $items_errors[$key])
+                                                        ))
+
+                                                            <div class="row g-2 p-2 break-time-block justify-content-center align-items-center"
+                                                                style="background: rgba(220, 252, 231, 1); border:1px solid #28a745;border-radius:8px;">
+                                                                <div class="col-4">
+                                                                    <button type="button" class="btn btn-sm mb-2" style="background: rgba(220, 252, 231, 1);">
+                                                                        <i class="fa-solid fa-utensils"></i> Ընդմիջման ժամ
+                                                                    </button>
+                                                                </div>
+                                                                <div class="col-3">
+                                                                    <label class="form-label small">Սկիզբ</label>
+                                                                    <input type="time"
+                                                                           class="form-control break-start"
+                                                                           name="week_days[{{ $key }}][break_start_time]"
+                                                                           value="{{ old('week_days.' .$key.'.break_start_time') }}"
+                                                                           >
+                                                                </div>
+                                                                <div class="col-3">
+                                                                    <label class="form-label small">Ավարտ</label>
+                                                                    <input type="time"
+                                                                           class="form-control break-end"
+                                                                           name="week_days[{{ $key }}][break_end_time]"
+                                                                           value="{{ old('week_days.' .$key.'.break_end_time') }}"
+                                                                           >
+                                                                </div>
+                                                                <div class="col-1 mt-4">
+                                                                    <a class="text-danger delete fw-bold ms-3" style="cursor:pointer;">x</a>
+                                                                </div>
+                                                            </div>
+                                                            @error('week_days.'.$key.'.break_time')
+                                                                    <div class="text-danger small mt-1">
+                                                                    {{ $message }}
+                                                                </div>
+                                                            @enderror
+                                                        @endif
+                                                    @endif
+
                                                 </div>
                                                 <div class="col-md-12 smoking-time-container mt-2">
+                                                    @if ( isset($items_errors[$key]['smoke_break']))
+                                                        @foreach ($items_errors[$key]['smoke_break'] as $i=>$s )
+
+
+                                                            <div class="row g-2 p-2 mt-2 smoking-time-block justify-content-center align-items-center"
+                                                                    style="background: rgba(254, 243, 198, 1); border:1px solid #ffc107;border-radius:8px;">
+                                                                    <div class="col-4">
+                                                                        <button type="button" class="btn btn-sm mb-2" style="background: rgba(254, 243, 198, 1);">
+                                                                            <i class="fa-solid fa-smoking"></i> Ծխելու ժամ
+                                                                        </button>
+                                                                    </div>
+                                                                    <div class="col-3">
+                                                                        <label class="form-label small">Սկիզբ</label>
+                                                                        <input type="time"
+                                                                            class="form-control smoke-start"
+                                                                            name="week_days[{{ $key }}][smoke_break][{{ $i }}][smoke_start_time]"
+                                                                            value="{{ old('week_days.'.$key.'.smoke_break.'. $i .'.smoke_start_time') }}"
+                                                                            >
+                                                                    </div>
+
+                                                                    <div class="col-3">
+                                                                        <label class="form-label small">Ավարտ</label>
+                                                                        <input type="time"
+                                                                                class="form-control smoke-end"
+                                                                                name="week_days[{{ $key }}][smoke_break][{{ $i }}][smoke_end_time]"
+                                                                                value="{{ old('week_days.'.$key.'.smoke_break.'. $i .'.smoke_end_time') }}"
+                                                                            >
+                                                                    </div>
+                                                                    <div class="col-1 mt-4">
+                                                                        <a class="text-danger delete fw-bold ms-3" style="cursor:pointer;">x</a>
+                                                                    </div>
+                                                                </div>
+                                                                @error('week_days.' . $key . '.smoke_break.' . $i)
+                                                                    <div class="text-danger small mt-1">
+                                                                    {{ $message }}
+                                                                </div>
+                                                                @enderror
+                                                        @endforeach
+
+                                                    @endif
+
 
                                                 </div>
 
@@ -166,7 +268,9 @@
                                     </div>
                                 </div>
 
+
                             @endforeach
+
 
                             <div class="col-12">
                                <div class="col-md-6">
@@ -180,5 +284,7 @@
             </section>
         </form>
     </main>
+
 @endsection
 <x-work-time-alert-modal :weekdays="$weekdays" />
+

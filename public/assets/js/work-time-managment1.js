@@ -1,49 +1,54 @@
-$(document).ready(function(){
-
+$(document).ready(function () {
     let sourceDayRow = null; // Օրը, որտեղից պատճենում ենք
     let selectedDays = [];
     let smokeCount = 0;
 
-    const $copyBtn = $('#copyToOthersBtn');
-    const $modal = $('#smallModal');
+    const $copyBtn = $("#copyToOthersBtn");
+    const $modal = $("#smallModal");
 
     // ================== FUNCTION =====================
     function isDayFilled($row) {
-        const start = $row.find('.start-time').val();
-        const end   = $row.find('.end-time').val();
+        const start = $row.find(".start-time").val();
+        const end = $row.find(".end-time").val();
         return start && end;
     }
 
     function collectDayData($row) {
-        const workStart = $row.find('.start-time').val();
-        const workEnd   = $row.find('.end-time').val();
+        const workStart = $row.find(".start-time").val();
+        const workEnd = $row.find(".end-time").val();
 
-        const $breakBlock = $row.find('.break-time-block');
-        const breakData = $breakBlock.length ? {
-            start: $breakBlock.find('.break-start').val(),
-            end: $breakBlock.find('.break-end').val()
-        } : null;
+        const $breakBlock = $row.find(".break-time-block");
+        const breakData = $breakBlock.length
+            ? {
+                  start: $breakBlock.find(".break-start").val(),
+                  end: $breakBlock.find(".break-end").val(),
+              }
+            : null;
 
         const smokingData = [];
-        $row.find('.smoking-time-block').each(function(){
+        $row.find(".smoking-time-block").each(function () {
             smokingData.push({
-                start: $(this).find('.smoke-start').val(),
-                end: $(this).find('.smoke-end').val()
+                start: $(this).find(".smoke-start").val(),
+                end: $(this).find(".smoke-end").val(),
             });
         });
 
-        return { work: {start: workStart, end: workEnd}, break: breakData, smoking: smokingData };
+        return {
+            work: { start: workStart, end: workEnd },
+            break: breakData,
+            smoking: smokingData,
+        };
     }
 
     function applyDayData($row, data) {
-        console.log($row,"row", data, 'data','applyDayData')
-        $row.find('.start-time').val(data.work.start);
-        $row.find('.end-time').val(data.work.end);
+        console.log($row, "row", data, "data", "applyDayData");
+        $row.find(".start-time").val(data.work.start);
+        $row.find(".end-time").val(data.work.end);
 
         // Break
-        const $breakContainer = $row.find('.break-time-container');
+        const $breakContainer = $row.find(".break-time-container");
         $breakContainer.empty();
-        if(data.break) {
+        if (data.break) {
             const html = `
                 <div class="row g-2 p-2 break-time-block justify-content-center align-items-center"
                      style="background: rgba(220, 252, 231, 1); border:1px solid #28a745;border-radius:8px;">
@@ -54,11 +59,11 @@ $(document).ready(function(){
                     </div>
                     <div class="col-3">
                         <label class="form-label small">Սկիզբ</label>
-                        <input type="time" name="week_days[${$row.data('day')}][break_start_time]" class="form-control break-start" value="${data.break.start}">
+                        <input type="time" name="week_days[${$row.data("day")}][break_start_time]" class="form-control break-start" value="${data.break.start}">
                     </div>
                     <div class="col-3">
                         <label class="form-label small">Ավարտ</label>
-                        <input type="time" name="week_days[${$row.data('day')}][break_end_time]" class="form-control break-end" value="${data.break.end}">
+                        <input type="time" name="week_days[${$row.data("day")}][break_end_time]" class="form-control break-end" value="${data.break.end}">
                     </div>
                     <div class="col-1 mt-4">
                         <a class="text-danger delete fw-bold ms-3" style="cursor:pointer;">x</a>
@@ -68,9 +73,9 @@ $(document).ready(function(){
         }
 
         // Smoking
-        const $smokeContainer = $row.find('.smoking-time-container');
+        const $smokeContainer = $row.find(".smoking-time-container");
         $smokeContainer.empty();
-        $.each(data.smoking, function(i, sm){
+        $.each(data.smoking, function (i, sm) {
             const html = `
             <div class="row g-2 p-2 mt-2 smoking-time-block justify-content-center align-items-center"
                  style="background: rgba(254, 243, 198, 1); border:1px solid #ffc107;border-radius:8px;">
@@ -81,11 +86,11 @@ $(document).ready(function(){
                 </div>
                 <div class="col-3">
                     <label class="form-label small">Սկիզբ</label>
-                    <input type="time" name="week_days[${$row.data('day')}][smoke_break][${i}][smoke_start_time]" class="form-control smoke-start" value="${sm.start}">
+                    <input type="time" name="week_days[${$row.data("day")}][smoke_break][${i}][smoke_start_time]" class="form-control smoke-start" value="${sm.start}">
                 </div>
                 <div class="col-3">
                     <label class="form-label small">Ավարտ</label>
-                    <input type="time" name="week_days[${$row.data('day')}][smoke_break][${i}][smoke_end_time]" class="form-control smoke-end" value="${sm.end}">
+                    <input type="time" name="week_days[${$row.data("day")}][smoke_break][${i}][smoke_end_time]" class="form-control smoke-end" value="${sm.end}">
                 </div>
                 <div class="col-1 mt-4">
                     <a class="text-danger delete fw-bold ms-3" style="cursor:pointer;">x</a>
@@ -96,42 +101,46 @@ $(document).ready(function(){
     }
 
     function checkFilledDays() {
-        console.log('checkFilledDays')
+        console.log("checkFilledDays");
         let filledCount = 0;
-        $('.day-row').each(function(){
-            if(isDayFilled($(this))) {
+        $(".day-row").each(function () {
+            if (isDayFilled($(this))) {
                 filledCount++;
-                if(!sourceDayRow) sourceDayRow = $(this);
+                if (!sourceDayRow) sourceDayRow = $(this);
             }
         });
-        if(filledCount >= 1) {
-            $copyBtn.removeClass('d-none');
+        if (filledCount >= 1) {
+            $copyBtn.removeClass("d-none");
         } else {
-            $copyBtn.addClass('d-none');
+            $copyBtn.addClass("d-none");
             sourceDayRow = null;
         }
     }
 
     function highlightSourceDay() {
-        $('#smallModal .week-day-item').removeClass('bg-primary text-white border-primary');
-        if(sourceDayRow) {
-            $(`#smallModal .week-day-item[data-day="${sourceDayRow.data('day')}"]`).addClass('bg-primary text-white border-primary');
+        $("#smallModal .week-day-item").removeClass(
+            "bg-primary text-white border-primary",
+        );
+        if (sourceDayRow) {
+            $(
+                `#smallModal .week-day-item[data-day="${sourceDayRow.data("day")}"]`,
+            ).addClass("bg-primary text-white border-primary");
         }
     }
 
     // ================== EVENTS ======================
 
     // Input change
-    $(document).on('input', '.start-time, .end-time', function(){
+    $(document).on("input", ".start-time, .end-time", function () {
         checkFilledDays();
     });
 
     // Break button
-    $(document).on('click', '.break-time', function(){
-        const $row = $(this).closest('.day-row');
-        const key = $row.data('day');
-        const $container = $row.find('.break-time-container');
-        if($container.find('.break-time-block').length) return;
+    $(document).on("click", ".break-time", function () {
+        const $row = $(this).closest(".day-row");
+        const key = $row.data("day");
+        const $container = $row.find(".break-time-container");
+        if ($container.find(".break-time-block").length) return;
         const html = `
         <div class="row g-2 p-2 break-time-block justify-content-center align-items-center"
              style="background: rgba(220, 252, 231, 1); border:1px solid #28a745;border-radius:8px;">
@@ -156,11 +165,11 @@ $(document).ready(function(){
     });
 
     // Smoke button
-    $(document).on('click', '.smoke-time', function(){
+    $(document).on("click", ".smoke-time", function () {
         smokeCount++;
-        const $row = $(this).closest('.day-row');
-        const key = $row.data('day');
-        const $container = $row.find('.smoking-time-container');
+        const $row = $(this).closest(".day-row");
+        const key = $row.data("day");
+        const $container = $row.find(".smoking-time-container");
         const html = `
         <div class="row g-2 p-2 mt-2 smoking-time-block justify-content-center align-items-center"
              style="background: rgba(254, 243, 198, 1); border:1px solid #ffc107;border-radius:8px;">
@@ -185,48 +194,47 @@ $(document).ready(function(){
     });
 
     // Delete
-    $(document).on('click', '.delete', function(){
-        $(this).closest('.row').remove();
+    $(document).on("click", ".delete", function () {
+        $(this).closest(".row").remove();
     });
 
     // Copy button click
-    $copyBtn.on('click', function(){
+    $copyBtn.on("click", function () {
         highlightSourceDay();
-        $modal.modal('show');
+        $modal.modal("show");
     });
 
     // Select weekday in modal
-    $(document).on('click', '#smallModal .week-day-item', function(){
-        const day = $(this).data('day');
-        if($(this).hasClass('bg-primary')){
-            $(this).removeClass('bg-primary text-white border-primary');
-            selectedDays = selectedDays.filter(d => d!==day);
+    $(document).on("click", "#smallModal .week-day-item", function () {
+        const day = $(this).data("day");
+        if ($(this).hasClass("bg-primary")) {
+            $(this).removeClass("bg-primary text-white border-primary");
+            selectedDays = selectedDays.filter((d) => d !== day);
         } else {
-            $(this).addClass('bg-primary text-white border-primary');
+            $(this).addClass("bg-primary text-white border-primary");
             selectedDays.push(day);
         }
-        console.log(selectedDays)
+        console.log(selectedDays);
     });
 
     // Apply button inside modal (պահանջվում է <button id="applyDays">Տարածել</button> modal-ի մեջ)
-    $(document).on('click', '#applyDays', function(){
-        alert(4444)
-        if(!sourceDayRow) return;
+    $(document).on("click", "#applyDays", function () {
+        alert(4444);
+        if (!sourceDayRow) return;
         const data = collectDayData(sourceDayRow);
-        console.log(data)
-        console.log(selectedDays,"selectedDays")
+        console.log(data);
+        console.log(selectedDays, "selectedDays");
 
-        selectedDays.forEach(dayKey=>{
+        selectedDays.forEach((dayKey) => {
             const $targetRow = $(`.day-row[data-day="${dayKey}"]`);
-            console.log($targetRow,'targetRow')
-            if($targetRow.length && !$targetRow.is(sourceDayRow)){
+            console.log($targetRow, "targetRow");
+            if ($targetRow.length && !$targetRow.is(sourceDayRow)) {
                 applyDayData($targetRow, data);
             }
         });
-        $modal.modal('hide');
+        $modal.modal("hide");
     });
 
     // INITIAL CHECK
     checkFilledDays();
-
 });
