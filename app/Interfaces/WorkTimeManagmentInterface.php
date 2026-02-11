@@ -5,6 +5,7 @@ use App\Models\ScheduleName;
 
 interface WorkTimeManagmentInterface
 {
+    public function index();
     public function createScheduleName(string $name, int $status): ScheduleName;
 
     public function attachClient(
@@ -23,4 +24,6 @@ interface WorkTimeManagmentInterface
         string $day,
         array $smoke
     ): void;
+
+    public function edit($id): ScheduleName;
 }

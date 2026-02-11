@@ -42,7 +42,7 @@ class ScheduleController extends Controller
     }
     public function storeScheduleName(ScheduleNameRequest $request)
     {
-        dd(ScheduleNameDto::fromRequestDto($request));
+        // dd(ScheduleNameDto::fromRequestDto($request));
 
         $data = $this->service->storeScheduleName(ScheduleNameDto::fromRequestDto($request));
         return redirect()->route('schedule.list');

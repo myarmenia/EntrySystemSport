@@ -31,13 +31,14 @@
                                 <div class="card">
                                     <div class="card-body">
                                         <div class="row  mt-3" >
+                                            {{-- {{ dd($data->name) }} --}}
                                             <div>
                                                 <label for="inputCity" class="form-label ">Անվանում</label>
                                                 <input type="text"
                                                         name="name"
                                                         class="form-control"
                                                         id="name"
-                                                        value={{ old('name') }}
+                                                        value="{{ $data->name ?? old('name')}}"
                                                         >
                                                 @error("name")
                                                     <div class="mb-3 row ">
@@ -63,7 +64,11 @@
                                                 <div class="col-1">
                                                     <div class="form-check form-switch" >
                                                         <input class="form-check-input" type="checkbox"
-                                                            name="status">
+                                                            name="status"
+                                                             value="1"
+                                                                {{ old('status', $data->status) ? 'checked' : '' }}
+
+                                                            >
                                                     </div>
                                                 </div>
                                             </div>
@@ -97,9 +102,26 @@
 
                             @php
                                 $items_errors = old("week_days",[]);
-                                // print_r($items_errors[0]);
+                                $scheduleDetailsByDay = $data->schedule_details->keyBy('week_day');
+                                $smokingDetailsByDay = $data->client_schedule_smokes->groupBy('week_day');
+                                // dump($smokingDetailsByDay);
                             @endphp
+
                             @foreach ($weekdays  as $key => $week )
+                                @php
+                                // dump($data);
+                                //    dump($week);
+                                //     dump($data->schedule_details->keyBy('week_day'));
+
+                                @endphp
+                                @php
+                                    $detail = $scheduleDetailsByDay[$week] ?? null;
+                                    $smokingDetail = $smokingDetailsByDay [$week] ?? null;
+                                    // dump($smokingDetail);
+                                    // dump($detail);
+                                    // dump($detail ? $detail->break_start_time : '' );
+                                    // dump($detail->day_break_start_time)
+                                @endphp
 
                                 <div class="col-8">
                                     <div class="card">
@@ -118,7 +140,9 @@
                                                         <input type="time"
                                                             name="week_days[{{ $key }}][day_start_time]"
                                                             class="form-control border-start-0 start-time"
-                                                            placeholder="09:00">
+                                                            placeholder="09:00"
+                                                            value="{{ $detail ? $detail->day_start_time : '' }}"
+                                                            >
                                                     </div>
                                                 </div>
                                                 <div class="col-md-4">
@@ -128,7 +152,8 @@
                                                         <input type="time"
                                                             name="week_days[{{ $key }}][day_end_time]"
                                                             class="form-control border-start-0 end-time"
-                                                            placeholder="09:00">
+                                                            placeholder="09:00"
+                                                             value="{{ $detail ? $detail->day_end_time : '' }}">
                                                     </div>
                                                 </div>
                                                <div class="col-md-4">
@@ -210,6 +235,15 @@
                                                         @endif
                                                     @endif
 
+                                                    @if ($detail?->break_start_time)
+                                                        <x-breake-section
+                                                        :key="$key"
+                                                        :break_start_time="$detail->break_start_time"
+                                                        :break_end_time="$detail->break_end_time"
+                                                    />
+
+                                                    @endif
+
                                                 </div>
                                                 <div class="col-md-12 smoking-time-container mt-2">
                                                     @if ( isset($items_errors[$key]['smoke_break']))
@@ -250,9 +284,12 @@
                                                                 </div>
                                                                 @enderror
                                                         @endforeach
-
                                                     @endif
 
+                                                    <x-smoke-section
+                                                                :key="$key"
+                                                                :smokingDetail="$smokingDetail ?? collect()"
+                                                    />
 
                                                 </div>
 

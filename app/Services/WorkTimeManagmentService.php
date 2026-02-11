@@ -1,30 +1,37 @@
 <?php
+
 namespace App\Services;
 
 use App\DTO\WorkTimeManagmentDto;
 use App\Interfaces\WorkTimeManagmentInterface;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class WorkTimeManagmentService
 {
-     public function __construct(
+    public function __construct(
         protected WorkTimeManagmentInterface $repository
     ) {}
-     public function store(
+    public function list(): Collection
+    {
+
+        $data = $this->repository->index();
+        return $data;
+    }
+    public function store(
         WorkTimeManagmentDto $dto,
         int $clientId
-    ): void
-    {
+    ): void {
         DB::transaction(function () use ($dto, $clientId) {
 
             $schedule = $this->repository
-                ->createScheduleName($dto->name,$dto->status);
+                ->createScheduleName($dto->name, $dto->status);
 
             $this->repository
                 ->attachClient($clientId, $schedule->id);
 
             foreach ($dto->weekDays as $day) {
-          
+
 
                 if (!empty($day['day_start_time']) && !empty($day['day_end_time'])) {
                     $this->repository
@@ -44,5 +51,12 @@ class WorkTimeManagmentService
                 }
             }
         });
+    }
+    public function editScheduleName($id){
+        // dd($id);
+
+        $data = $this->repository->edit($id);
+        return $data;
+
     }
 }

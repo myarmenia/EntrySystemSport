@@ -15,7 +15,10 @@ class WorkTimeManagmentController extends Controller
     public function __construct( protected WorkTimeManagmentService $service){}
     public function index(): View{
 
-        return view('work-time-managment.index');
+        $data = $this->service->list();
+        $i = 0;
+
+        return view('work-time-managment.index', compact('data', 'i'));
     }
     public function create(): View{
 
@@ -32,4 +35,13 @@ class WorkTimeManagmentController extends Controller
         $data = $this->service->store($dto,  $client_id);
         return redirect()->route('schedule.work-time-list');
     }
+    public function edit($id)
+    {
+        $weekdays = MyHelper::week_days();
+
+        $data = $this->service->editScheduleName($id);
+
+        return view('work-time-managment.edit', compact('data', 'weekdays'));
+    }
+
 }
