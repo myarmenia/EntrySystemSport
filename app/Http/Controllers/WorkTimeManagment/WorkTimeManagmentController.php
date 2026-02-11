@@ -24,7 +24,7 @@ class WorkTimeManagmentController extends Controller
         return view('work-time-managment.create',compact('weekdays'));
     }
     public function store(WorkTimeManagmentRequest $request){
-        dd($request->all());
+        // dd($request->all());
 
         $dto = WorkTimeManagmentDto::fromRequest($request);
 

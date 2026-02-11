@@ -1,25 +1,7 @@
 @extends('layouts.app')
 @section('page-script')
-    <script src="{{ asset('assets/js/work-time-managment1.js') }}"></script>
+    <script src="{{ asset('assets/js/work-time-managment.js') }}"></script>
 @endsection
-{{-- @section('style')
-<style>
-.time-input::-webkit-calendar-picker-indicator {
-    opacity: 0;
-    cursor: pointer;
-}
-
-/* Firefox */
-.time-input {
-    appearance: none;
-    -moz-appearance: textfield;
-}
-</style>
-
-
-@endsection --}}
-
-
 @section('content')
 
     <main id="main" class="main">
@@ -64,7 +46,7 @@
                                                     </div>
                                                 @enderror
                                             </div>
-                                            @if ($errors->any())
+                                            {{-- @if ($errors->any())
                                                 <div class="alert alert-danger">
                                                     <ul class="mb-0">
                                                         @foreach ($errors->all() as $er=>$error)
@@ -72,7 +54,7 @@
                                                         @endforeach
                                                     </ul>
                                                 </div>
-                                            @endif
+                                            @endif --}}
 
                                         </div>
                                          @if(auth()->user()->hasAnyRole(['client_admin',"client_admin_rfID","client_sport"]))
@@ -99,12 +81,25 @@
                                  {{-- id="applyToAll" --}}
                                  >Տարածել շաբաթվա բոլոր օրերի վրա</a>
                             </div>
-                            @error('week_days.0')
+                            @if (
+                                !$errors->has('week_days.0.day_time') &&
+                                !$errors->has('week_days.1.day_time') &&
+                                !$errors->has('week_days.2.day_time') &&
+                                !$errors->has('week_days.3.day_time') &&
+                                !$errors->has('week_days.4.day_time') &&
+                                !$errors->has('week_days.5.day_time') &&
+                                !$errors->has('week_days.6.day_time')
+                                 )
+
+                                  @error('week_days')
                                 <div class="col-8 alert alert-danger mt-2">{{ $message }}</div>
                             @enderror
+
+                            @endif
+
                             @php
                                 $items_errors = old("week_days",[]);
-                                // print_r($items_errors);
+                                // print_r($items_errors[0]);
                             @endphp
                             @foreach ($weekdays  as $key => $week )
 
@@ -114,14 +109,9 @@
                                             <div class="row mt-3 day-row" data-day="{{ $key }}">
                                                 <div class="d-flex justify-content-between">
                                                     <h6 class="fw-bold">{{ $week }}</h6>
-                                                  @error('week_days.'.$key)
-                                                                    <div class="text-danger small mt-1">
-                                                                    {{ $message }}11111111118
-                                                                </div>
-                                                            @enderror
-
                                                     <input type="hidden" name="week_days[{{ $key }}][week_day]" value="{{ $week }}">
                                                 </div>
+
 
                                                 <div class="col-md-4">
                                                     <label for="inputCity" class="form-label">Աշխատանքային ժամի սկիզբ</label>
@@ -174,6 +164,11 @@
                                                         </button>
                                                     </div>
                                                 </div>
+                                                 @error('week_days.'.$key.'.day_time')
+                                                    <div class="text-danger small mt-1">
+                                                        {{ $message }}
+                                                    </div>
+                                                @enderror
                                                 <div class="col-md-12 break-time-container mt-3">
 
                                                     @if(array_key_exists($key, $items_errors))
@@ -210,7 +205,7 @@
                                                                 </div>
                                                             </div>
                                                             @error('week_days.'.$key.'.break_time')
-                                                                    <div class="text-danger small mt-1">
+                                                                    <div class="text-danger  small mt-1 break-error">
                                                                     {{ $message }}
                                                                 </div>
                                                             @enderror
@@ -252,7 +247,7 @@
                                                                     </div>
                                                                 </div>
                                                                 @error('week_days.' . $key . '.smoke_break.' . $i)
-                                                                    <div class="text-danger small mt-1">
+                                                                    <div class="text-danger small mt-1 smoke-error">
                                                                     {{ $message }}
                                                                 </div>
                                                                 @enderror

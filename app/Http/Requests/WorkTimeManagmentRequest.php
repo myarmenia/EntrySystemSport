@@ -6,124 +6,133 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class WorkTimeManagmentRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
         return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
-   public function rules(): array
-{
+    public function rules(): array
+    {
+        return [
+            'name' => ['required', 'string', 'max:255'],
 
+            'week_days' => [
+                'required',
+                'array',
+                function ($attribute, $value, $fail) {
 
-    $data= [
-        'name' => ['required', 'string', 'max:255'],
+                    $hasAtLeastOneWorkDay = false;
 
+                    foreach ($value as $dayIndex => $day) {
 
-        'week_days' => [
+                        $dayStart = $day['day_start_time'] ?? null;
+                        $dayEnd   = $day['day_end_time'] ?? null;
 
-            'array',
-            function ($attribute, $value, $fail) {
+                        // ===== գոնե մեկ լիարժեք աշխատանքային օր =====
+                        if ($dayStart && $dayEnd) {
+                            $hasAtLeastOneWorkDay = true;
+                        }
 
-                $validDayExists = false;
+                        // ===== ստուգում՝ կա՞ break կամ smoke =====
+                        $hasBreak =
+                            array_key_exists('break_start_time', $day) ||
+                            array_key_exists('break_end_time', $day);
 
-                foreach ($value as $dayIndex => $day) {
-                    // dd($day);
+                        $hasSmoke =
+                            !empty($day['smoke_break']) && is_array($day['smoke_break']);
 
-                    $dayName = $day['week_day'] ?? 'Օր';
-
-                    // ===== Minimum մեկ օր =====
-                    if (!empty($day['day_start_time']) && !empty($day['day_end_time'])) {
-                        $validDayExists = true;
-                    }
-
-                    // ===== Break validation =====
-
-                    // if (isset($day['break_start_time']) || isset($day['break_end_time'])) {
-                    //     dd(11);
-                    if (array_key_exists('break_start_time', $day) && array_key_exists('break_end_time', $day) ) {
-
-                        if ($day['break_start_time'] === null  || $day['break_end_time'] === null) {
-
+                        // ===== եթե կա break կամ smoke → պարտադիր է day_start/day_end =====
+                        if (($hasBreak || $hasSmoke) && (!$dayStart || !$dayEnd)) {
 
                             $fail(
-                                "week_days.$dayIndex.break_time",
-                                "Ընդմիջման սկիզբը և ավարտը պետք է երկուսն էլ լրացված լինեն։"
+                                "week_days.$dayIndex.day_time",
+                                'Ընդմիջում կամ ծխելու ժամ ավելացնելու դեպքում տվյալ օրվա աշխատանքային ժամերը պարտադիր են։'
                             );
                         }
-                        elseif ($day['break_end_time'] <= $day['break_start_time']) {
 
-                            $fail(
-                                "week_days.$dayIndex.break_time",
-                                "Ընդմիջման ավարտը պետք է մեծ լինի սկիզբի ժամանակից։"
-                            );
-                        }
-                    }
+                        // ================= BREAK =================
+                        if ($hasBreak) {
+                            // dd('hasBreak');
 
-                    // ===== Smoke validation =====
-                    if (!empty($day['smoke_break']) && is_array($day['smoke_break'])) {
-
-                        foreach ($day['smoke_break'] as $smokeIndex => $smoke) {
-
-                            $smokeStart = $smoke['smoke_start_time'] ?? null;
-                            $smokeEnd   = $smoke['smoke_end_time'] ?? null;
-
-                            $errorKey = "week_days.$dayIndex.smoke_break.$smokeIndex";
-
-                            if (!$smokeStart && !$smokeEnd) {
+                            $breakStart = $day['break_start_time'] ?? null;
+                            $breakEnd   = $day['break_end_time'] ?? null;
+// dd($breakStart,!$breakStart);
+                            if (!$breakStart && !$breakEnd) {
+                                $fail(
+                                    "week_days.$dayIndex.break_time",
+                                    'Ընդմիջման սկիզբն ու ավարտը պարտադիր են։'
+                                );
+                            }
+                             elseif (($breakStart && !$breakEnd) || (!$breakStart && $breakEnd)) {
+                                // dd(111);
 
                                 $fail(
-                                    $errorKey,
-                                    // "Օր `$dayName`, ծխելու ժամ #".($smokeIndex).": Սկիզբ և ավարտը չեն լրացված։"
-                                     "Ծխելու ժամի սկիզբ և ավարտը չեն լրացված։"
+                                    "week_days.$dayIndex.break_time",
+                                    'Ընդմիջման սկիզբն ու ավարտը պարտադիր են։'
                                 );
 
-                            } elseif ($smokeStart && $smokeEnd && $smokeEnd <= $smokeStart) {
+                            } elseif ($breakStart && $breakEnd && $breakEnd <= $breakStart) {
 
                                 $fail(
-                                    $errorKey,
-                                    "Ծխելու ժամի ավարտը պետք է մեծ լինի սկիզբից։"
-                                );
-
-                            } elseif (($smokeStart && !$smokeEnd) || (!$smokeStart && $smokeEnd)) {
-
-                                $fail(
-                                    $errorKey,
-                                    "Ծխելու ժամի  սկիզբն ու ավարտը պարտադիր են։"
+                                    "week_days.$dayIndex.break_time",
+                                    'Ընդմիջման ավարտը պետք է մեծ լինի սկիզբից։'
                                 );
                             }
                         }
+
+                        // ================= SMOKE =================
+                        if ($hasSmoke) {
+
+                            foreach ($day['smoke_break'] as $smokeIndex => $smoke) {
+
+                                $smokeStart = $smoke['smoke_start_time'] ?? null;
+                                $smokeEnd   = $smoke['smoke_end_time'] ?? null;
+
+                                $errorKey = "week_days.$dayIndex.smoke_break.$smokeIndex";
+                                if (!$smokeStart &&  !$smokeEnd) {
+
+                                    $fail(
+                                        $errorKey,
+                                        'Ծխելու ժամի սկիզբն ու ավարտը պարտադիր են։'
+                                    );
+
+                                }
+                                elseif (($smokeStart && !$smokeEnd) || (!$smokeStart && $smokeEnd)) {
+
+                                    $fail(
+                                        $errorKey,
+                                        'Ծխելու ժամի սկիզբն ու ավարտը պարտադիր են։'
+                                    );
+
+                                } elseif ($smokeStart && $smokeEnd && $smokeEnd <= $smokeStart) {
+
+                                    $fail(
+                                        $errorKey,
+                                        'Ծխելու ժամի ավարտը պետք է մեծ լինի սկիզբից։'
+                                    );
+                                }
+                            }
+                        }
+                    }
+
+                    // ===== եթե ոչ մի օր չունի աշխատանքային ժամ =====
+                    // dd(!$hasAtLeastOneWorkDay);
+                    if (!$hasAtLeastOneWorkDay) {
+
+                        $fail(
+                            'week_days',
+                            'Անհրաժեշտ է լրացնել առնվազն մեկ օրվա աշխատանքային ժամի սկիզբը և ավարտը։'
+                        );
                     }
                 }
-
-                if (!$validDayExists) {
-                   
-                    $fail(
-                        'week_days.'.$dayIndex,
-                        'Անհրաժեշտ է լրացնել առնվազն մեկ օրվա աշխատանքային ժամի սկիզբը և ավարտը։'
-                    );
-                }
-            }
-        ],
-
-    ];
-    return $data;
-
-}
-
+            ],
+        ];
+    }
 
     public function messages(): array
     {
         return [
-            'name.required' => 'Խնդրում ենք լրացնել անունը։',
+            'name.required' => 'Անվանում դաշտը պարտադիր է։',
         ];
     }
-
 }
