@@ -1,7 +1,8 @@
 $(document).ready(function () {
     let sourceDayRow = null; // Օրը, որտեղից պատճենում ենք
     let selectedDays = [];
-    // let smokeCount = 0;
+
+    let lastChangedDayRow = null;
 
     const $copyBtn = $("#copyToOthersBtn");
     const $modal = $("#smallModal");
@@ -10,8 +11,11 @@ $(document).ready(function () {
     function isDayFilled($row) {
         const start = $row.find(".start-time").val();
         const end = $row.find(".end-time").val();
-        return start && end;
+        return start !== "" || end !== "";
     }
+    // function isValidTime(value) {
+    // return typeof value === "string" && /^\d{2}:\d{2}$/.test(value);
+// }
 
     function collectDayData($row) {
         alert('collectDayData')
@@ -102,22 +106,39 @@ $(document).ready(function () {
         });
     }
 
+    // function checkFilledDays() {
+    //     console.log("checkFilledDays");
+    //     let filledCount = 0;
+    //     $(".day-row").each(function () {
+    //         if (isDayFilled($(this))) {
+    //             filledCount++;
+    //             console.log(filledCount,'filledCount')
+    //             if (!sourceDayRow) sourceDayRow = $(this);
+    //             console.log(sourceDayRow);
+    //         }
+    //     });
+    //     if (filledCount >= 1) {
+    //         $copyBtn.removeClass("d-none");
+    //     } else {
+    //         $copyBtn.addClass("d-none");
+    //         sourceDayRow = null;
+    //     }
+    // }
     function checkFilledDays() {
-        console.log("checkFilledDays");
         let filledCount = 0;
+
         $(".day-row").each(function () {
             if (isDayFilled($(this))) {
                 filledCount++;
-                console.log(filledCount,'filledCount')
-                if (!sourceDayRow) sourceDayRow = $(this);
-                console.log(sourceDayRow);
             }
         });
+
         if (filledCount >= 1) {
             $copyBtn.removeClass("d-none");
         } else {
             $copyBtn.addClass("d-none");
             sourceDayRow = null;
+            lastChangedDayRow = null;
         }
     }
 
@@ -137,8 +158,26 @@ $(document).ready(function () {
     // ================== EVENTS ======================
 
     // Input change
-    $(document).on("input", ".start-time, .end-time", function () {
+    $(document).on("change", ".day-row .start-time, .day-row .end-time", function () {
+        // alert()
+        // checkFilledDays();
+
+        const $row = $(this).closest(".day-row");
+
+        // եթե տվյալ օրը դեռ ամբողջությամբ լրացված չէ → source չդարձնել
+        if (!isDayFilled($row)) {
+            // ստուգում ենք՝ գոնե մեկ ամբողջությամբ լրացված օր կա՞
+            checkFilledDays();
+            return;
+        }
+
+        // եթե լրացված է՝ թող նա դառնա source
+        console.log($row)
+        lastChangedDayRow = $row;
+
+        sourceDayRow = $row;
         checkFilledDays();
+
     });
 
     // Break button
@@ -254,5 +293,5 @@ $(document).ready(function () {
     });
 
     // INITIAL CHECK
-    checkFilledDays();
+    // checkFilledDays();
 });

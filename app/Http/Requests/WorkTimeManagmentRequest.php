@@ -13,6 +13,8 @@ class WorkTimeManagmentRequest extends FormRequest
 
     public function rules(): array
     {
+        // dd($this);
+
         return [
             'name' => ['required', 'string', 'max:255'],
 
@@ -31,6 +33,13 @@ class WorkTimeManagmentRequest extends FormRequest
                         // ===== even one full day =====
                         if ($dayStart && $dayEnd) {
                             $hasAtLeastOneWorkDay = true;
+                        }
+                         if (!$dayStart || !$dayEnd) {
+
+                            $fail(
+                                "week_days.$dayIndex.day_time",
+                                ' ժամ ավելացնելու դեպքում տվյալ օրվա աշխատանքային ժամերը պարտադիր են։'
+                            );
                         }
 
                         // ===== check break or smoke =====
