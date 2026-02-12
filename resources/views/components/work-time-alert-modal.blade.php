@@ -5,9 +5,9 @@
 
       <!-- Modal Header -->
       <div class="modal-header bg-primary text-white border-0">
-        <h5 class="modal-title" id="smallModalLabel">
-          Երկուշաբթի օրը պետք է լինի լրացված
-        </h5>
+        {{-- <h5 class="modal-title" id="smallModalLabel">
+          Տարածել շաբաթվա օրերի վրա պետք է լինի լրացված
+        </h5> --}}
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
 

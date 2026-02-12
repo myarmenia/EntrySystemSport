@@ -28,12 +28,12 @@ class WorkTimeManagmentRequest extends FormRequest
                         $dayStart = $day['day_start_time'] ?? null;
                         $dayEnd   = $day['day_end_time'] ?? null;
 
-                        // ===== գոնե մեկ լիարժեք աշխատանքային օր =====
+                        // ===== even one full day =====
                         if ($dayStart && $dayEnd) {
                             $hasAtLeastOneWorkDay = true;
                         }
 
-                        // ===== ստուգում՝ կա՞ break կամ smoke =====
+                        // ===== check break or smoke =====
                         $hasBreak =
                             array_key_exists('break_start_time', $day) ||
                             array_key_exists('break_end_time', $day);
@@ -41,7 +41,7 @@ class WorkTimeManagmentRequest extends FormRequest
                         $hasSmoke =
                             !empty($day['smoke_break']) && is_array($day['smoke_break']);
 
-                        // ===== եթե կա break կամ smoke → պարտադիր է day_start/day_end =====
+                        // ===== if isset break or smoke → required day_start/day_end =====
                         if (($hasBreak || $hasSmoke) && (!$dayStart || !$dayEnd)) {
 
                             $fail(
@@ -56,7 +56,7 @@ class WorkTimeManagmentRequest extends FormRequest
 
                             $breakStart = $day['break_start_time'] ?? null;
                             $breakEnd   = $day['break_end_time'] ?? null;
-// dd($breakStart,!$breakStart);
+
                             if (!$breakStart && !$breakEnd) {
                                 $fail(
                                     "week_days.$dayIndex.break_time",
@@ -114,8 +114,6 @@ class WorkTimeManagmentRequest extends FormRequest
                             }
                         }
                     }
-
-                    // ===== եթե ոչ մի օր չունի աշխատանքային ժամ =====
                     // dd(!$hasAtLeastOneWorkDay);
                     if (!$hasAtLeastOneWorkDay) {
 

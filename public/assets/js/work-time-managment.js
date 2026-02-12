@@ -106,7 +106,9 @@ $(document).ready(function () {
         $(".day-row").each(function () {
             if (isDayFilled($(this))) {
                 filledCount++;
+                console.log(filledCount,'filledCount')
                 if (!sourceDayRow) sourceDayRow = $(this);
+                console.log(sourceDayRow);
             }
         });
         if (filledCount >= 1) {
@@ -118,10 +120,12 @@ $(document).ready(function () {
     }
 
     function highlightSourceDay() {
+
         $("#smallModal .week-day-item").removeClass(
             "bg-primary text-white border-primary",
         );
         if (sourceDayRow) {
+            console.log(sourceDayRow)
             $(
                 `#smallModal .week-day-item[data-day="${sourceDayRow.data("day")}"]`,
             ).addClass("bg-primary text-white border-primary");
@@ -224,7 +228,7 @@ $(document).ready(function () {
 
     // Apply button inside modal (պահանջվում է <button id="applyDays">Տարածել</button> modal-ի մեջ)
     $(document).on("click", "#applyDays", function () {
-        alert(4444);
+
         if (!sourceDayRow) return;
         const data = collectDayData(sourceDayRow);
         console.log(data);

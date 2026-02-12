@@ -158,6 +158,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('work-time-create',[WorkTimeManagmentController::class,'create'])->name('schedule.work-time-create');
         Route::post('work-time-store',[WorkTimeManagmentController::class,'store'])->name('schedule.work-time-store');
         Route::get('{id}/work-time-edit',[WorkTimeManagmentController::class,'edit'])->name('schedule.work-time-edit');
+        Route::put('{id}/',[WorkTimeManagmentController::class,'update'])->name('schedule.work-time-update');
         });
 
     Route::group(['prefix' => 'package'], function () {

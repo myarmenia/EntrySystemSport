@@ -10,8 +10,8 @@
                 <h1>Աշխատանքային ժամանակի ստեղծում</h1>
                 <nav>
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-                        <li class="breadcrumb-item active">Dashboard</li>
+                        <li class="breadcrumb-item"><a href="{{route('schedule.work-time-list')}}">Ժամանակացույց</a></li>
+                        <li class="breadcrumb-item active">Ստեղծել</li>
                     </ol>
                 </nav>
 
@@ -46,16 +46,6 @@
                                                     </div>
                                                 @enderror
                                             </div>
-                                            {{-- @if ($errors->any())
-                                                <div class="alert alert-danger">
-                                                    <ul class="mb-0">
-                                                        @foreach ($errors->all() as $er=>$error)
-                                                            <li>{{ $error }}</li>
-                                                        @endforeach
-                                                    </ul>
-                                                </div>
-                                            @endif --}}
-
                                         </div>
                                          @if(auth()->user()->hasAnyRole(['client_admin',"client_admin_rfID","client_sport"]))
                                             <div class="row mb-3 col-6 d-flex align-items-center gap-2">
@@ -77,7 +67,7 @@
                                     href="javascript:void(0)"
                                     data-bs-toggle="modal"
                                     data-bs-target="#smallModal"
-                                 >Տարածել շաբաթվա բոլոր օրերի վրա</a>
+                                 >Տարածել շաբաթվա օրերի վրա</a>
                             </div>
                             @if (
                                 !$errors->has('week_days.0.day_time') &&

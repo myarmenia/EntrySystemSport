@@ -7,19 +7,20 @@
     <main id="main" class="main">
         <div class="pagetitle d-flex justify-content-between">
             <div>
-                <h1>Աշխատանքային ժամանակի ստեղծում</h1>
+                <h1>Աշխատանքային ժամանակի խմբագրում </h1>
                 <nav>
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-                        <li class="breadcrumb-item active">Dashboard</li>
+                        <li class="breadcrumb-item"><a href="{{route('schedule.work-time-list')}}">Ժամանակացույց</a></li>
+                        <li class="breadcrumb-item active">Խմբագրել</li>
                     </ol>
                 </nav>
 
             </div>
         </div><!-- End Page Title -->
 
-        <form action="{{ route('schedule.work-time-store') }}" method="post">
+        <form action="{{ route('schedule.work-time-update',$data->id) }}" method="post">
             @csrf
+             @method('put')
             <section class="section dashboard">
                 <div class="row">
                     <!-- Left side columns -->
@@ -47,15 +48,6 @@
                                                     </div>
                                                 @enderror
                                             </div>
-                                            {{-- @if ($errors->any())
-                                                <div class="alert alert-danger">
-                                                    <ul class="mb-0">
-                                                        @foreach ($errors->all() as $er=>$error)
-                                                            <li>{{ $error }}</li>
-                                                        @endforeach
-                                                    </ul>
-                                                </div>
-                                            @endif --}}
 
                                         </div>
                                          @if(auth()->user()->hasAnyRole(['client_admin',"client_admin_rfID","client_sport"]))
@@ -82,7 +74,7 @@
                                     href="javascript:void(0)"
                                     data-bs-toggle="modal"
                                     data-bs-target="#smallModal"
-                                 >Տարածել շաբաթվա բոլոր օրերի վրա</a>
+                                 >Տարածել շաբաթվա օրերի վրա</a>
                             </div>
                             @if (
                                 !$errors->has('week_days.0.day_time') &&
@@ -108,12 +100,7 @@
                             @endphp
 
                             @foreach ($weekdays  as $key => $week )
-                                @php
-                                // dump($data);
-                                //    dump($week);
-                                //     dump($data->schedule_details->keyBy('week_day'));
 
-                                @endphp
                                 @php
                                     $detail = $scheduleDetailsByDay[$week] ?? null;
                                     $smokingDetail = $smokingDetailsByDay [$week] ?? null;
@@ -304,7 +291,7 @@
 
                             <div class="col-12">
                                <div class="col-md-6">
-                                    <button type="submit" class="btn btn-primary">Ստեղծել</button>
+                                    <button type="submit" class="btn btn-primary">Պահպանել</button>
                                 </div>
 
                             </div>

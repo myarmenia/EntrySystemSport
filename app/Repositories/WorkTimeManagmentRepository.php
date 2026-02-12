@@ -58,12 +58,8 @@ class WorkTimeManagmentRepository implements WorkTimeManagmentInterface
         ]);
     }
 
-    public function createSmokeBreak(
-        int $clientId,
-        int $scheduleNameId,
-        string $day,
-        array $smoke
-    ): void {
+    public function createSmokeBreak(int $clientId,int $scheduleNameId,string $day,array $smoke): void
+    {
         ClientScheduleSmoke::create([
             'client_id' => $clientId,
             'schedule_name_id' => $scheduleNameId,
@@ -79,5 +75,26 @@ class WorkTimeManagmentRepository implements WorkTimeManagmentInterface
         $data = ScheduleName::with('schedule_details','client_schedule_smokes')->findOrFail($id);
 
         return $data;
+    }
+
+    public function updateScheduleName(int $scheduleId,string $name,int $status): void
+    {
+        ScheduleName::where('id', $scheduleId)
+                    ->update([
+                        'name' => $name,
+                        'status' => $status,
+                    ]);
+    }
+
+    public function deleteScheduleDetails(int $scheduleId): void
+    {
+        ScheduleDetails::where('schedule_name_id', $scheduleId)->delete();
+    }
+
+    public function deleteSmokeBreaks(int $scheduleId,int $clientId): void
+    {
+        ClientScheduleSmoke::where('schedule_name_id', $scheduleId)
+                            ->where('client_id', $clientId)
+                            ->delete();
     }
 }

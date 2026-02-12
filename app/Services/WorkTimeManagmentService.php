@@ -59,4 +59,44 @@ class WorkTimeManagmentService
         return $data;
 
     }
+    public function update(
+        int $scheduleId,
+        WorkTimeManagmentDto $dto,
+        int $clientId
+    ): void {
+        DB::transaction(function () use ($scheduleId, $dto, $clientId) {
+
+            // update schedule name
+            $this->repository->updateScheduleName(
+                $scheduleId,
+                $dto->name,
+                $dto->status
+            );
+
+            // deleting old data
+            $this->repository->deleteScheduleDetails($scheduleId);
+            $this->repository->deleteSmokeBreaks($scheduleId, $clientId);
+
+            // creating new data by request 
+            foreach ($dto->weekDays as $day) {
+
+                if (!empty($day['day_start_time']) && !empty($day['day_end_time'])) {
+                    $this->repository
+                        ->createScheduleDetail($scheduleId, $day);
+                }
+
+                if (!empty($day['smoke_break'])) {
+                    foreach ($day['smoke_break'] as $smoke) {
+                        $this->repository->createSmokeBreak(
+                            $clientId,
+                            $scheduleId,
+                            $day['week_day'],
+                            $smoke
+                        );
+                    }
+                }
+            }
+        });
+    }
+
 }

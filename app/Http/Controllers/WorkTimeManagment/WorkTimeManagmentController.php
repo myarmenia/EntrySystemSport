@@ -43,5 +43,14 @@ class WorkTimeManagmentController extends Controller
 
         return view('work-time-managment.edit', compact('data', 'weekdays'));
     }
+    public function update(WorkTimeManagmentRequest $request,int $scheduleId) {
+        $dto = WorkTimeManagmentDto::fromRequest($request);
+
+        $clientId = MyHelper::find_auth_user_client();
+
+        $this->service->update($scheduleId, $dto, $clientId);
+
+        return redirect()->route('schedule.work-time-edit',$scheduleId);
+    }
 
 }
