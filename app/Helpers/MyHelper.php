@@ -24,7 +24,16 @@ class MyHelper
     }
     public static function week_days(){
 
-        $weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday','Friday','Saturday','Sunday'];
+        // $weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday','Friday','Saturday','Sunday'];
+        $weekdays = [
+                    'Monday'=>'Երկուշաբթի',
+                    'Tuesday'=>'Երեքշաբթի',
+                    'Wednesday'=>'Չորեքշաբթի',
+                    'Thursday'=>'Հինգշաբթի',
+                    'Friday'=>'Ուրբաթ',
+                    'Saturday'=>'Շաբաթ',
+                    'Sunday'=>'Կիրակի'
+                    ];
 
         return $weekdays;
     }

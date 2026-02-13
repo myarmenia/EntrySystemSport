@@ -34,13 +34,23 @@ class WorkTimeManagmentRequest extends FormRequest
                         if ($dayStart && $dayEnd) {
                             $hasAtLeastOneWorkDay = true;
                         }
-                         if (!$dayStart || !$dayEnd) {
 
-                            $fail(
-                                "week_days.$dayIndex.day_time",
-                                ' ժամ ավելացնելու դեպքում տվյալ օրվա աշխատանքային ժամերը պարտադիր են։'
-                            );
-                        }
+                            if ($dayStart && $dayEnd && $dayEnd <= $dayStart) {
+
+                                $fail(
+                                    "week_days.$dayIndex.day_time",
+                                    'Աշխատանքային ավարտը պետք է մեծ լինի սկիզբից։'
+                                );
+                            }
+                            if (request()->routeIs('schedule.work-time-update')) {
+                                if (($dayStart && !$dayEnd) || ($dayEnd && !$dayStart)) {
+
+                                    $fail(
+                                        "week_days.$dayIndex.day_time",
+                                        ' ժամ ավելացնելու դեպքում տվյալ օրվա աշխատանքային ժամերը պարտադիր են։'
+                                    );
+                                }
+                            }
 
                         // ===== check break or smoke =====
                         $hasBreak =

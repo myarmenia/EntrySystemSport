@@ -2,6 +2,15 @@
 @section('page-script')
     <script src="{{ asset('assets/js/work-time-managment.js') }}"></script>
 @endsection
+@section('style')
+<style>
+    .form-label{
+        color: rgba(49, 65, 88, 1)
+    }
+
+</style>
+
+@endsection
 @section('content')
 
     <main id="main" class="main">
@@ -50,8 +59,8 @@
                                          @if(auth()->user()->hasAnyRole(['client_admin',"client_admin_rfID","client_sport"]))
                                             <div class="row mb-3 col-6 d-flex align-items-center gap-2">
                                                 <label class="col-4 col-form-label">Ակտիվացում </label>
-                                                <div class="col-1">
-                                                    <div class="form-check form-switch" >
+                                                <div class="col-1" style="margin: 5px 0 0 -60px">
+                                                    <div class="form-check form-switch"  >
                                                         <input class="form-check-input" type="checkbox"
                                                             name="status">
                                                     </div>
@@ -61,12 +70,13 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class=" col-8 pagetitle d-flex justify-content-end  ">
+                            <div class=" col-8 pagetitle d-flex justify-content-end mb-3">
                                 <a  id="copyToOthersBtn"
                                     class="d-none"
                                     href="javascript:void(0)"
                                     data-bs-toggle="modal"
                                     data-bs-target="#smallModal"
+                                     style="color: rgba(21, 93, 252, 1); margin-right:60px"
                                  >Տարածել շաբաթվա օրերի վրա</a>
                             </div>
                             @if (
@@ -99,8 +109,6 @@
                                                     <h6 class="fw-bold">{{ $week }}</h6>
                                                     <input type="hidden" name="week_days[{{ $key }}][week_day]" value="{{ $week }}">
                                                 </div>
-
-
                                                 <div class="col-md-4">
                                                     <label for="inputCity" class="form-label">Աշխատանքային ժամի սկիզբ</label>
                                                     <div class="input-group">
@@ -148,7 +156,12 @@
                                                                     color: #ffc107;
                                                                     font-weight: 600;
                                                                 ">
-                                                            <i class="fa-solid fa-smoking"></i> Ծխելու ժամ
+
+
+                                                            <i class="fa-solid fa-smoking"
+                                                                style="color: rgba(187, 77, 0, 1)"
+                                                            ></i>
+                                                            <span style="color: rgba(187, 77, 0, 1)"> Ծխելու ժամ</span>
                                                         </button>
                                                     </div>
                                                 </div>
@@ -164,82 +177,20 @@
                                                         @if (( array_key_exists('break_start_time', $items_errors[$key])) ||
                                                             (array_key_exists('break_end_time', $items_errors[$key])
                                                         ))
-
-                                                            <div class="row g-2 p-2 break-time-block justify-content-center align-items-center"
-                                                                style="background: rgba(220, 252, 231, 1); border:1px solid #28a745;border-radius:8px;">
-                                                                <div class="col-4">
-                                                                    <button type="button" class="btn btn-sm mb-2" style="background: rgba(220, 252, 231, 1);">
-                                                                        <i class="fa-solid fa-utensils"></i> Ընդմիջման ժամ
-                                                                    </button>
-                                                                </div>
-                                                                <div class="col-3">
-                                                                    <label class="form-label small">Սկիզբ</label>
-                                                                    <input type="time"
-                                                                           class="form-control break-start"
-                                                                           name="week_days[{{ $key }}][break_start_time]"
-                                                                           value="{{ old('week_days.' .$key.'.break_start_time') }}"
-                                                                           >
-                                                                </div>
-                                                                <div class="col-3">
-                                                                    <label class="form-label small">Ավարտ</label>
-                                                                    <input type="time"
-                                                                           class="form-control break-end"
-                                                                           name="week_days[{{ $key }}][break_end_time]"
-                                                                           value="{{ old('week_days.' .$key.'.break_end_time') }}"
-                                                                           >
-                                                                </div>
-                                                                <div class="col-1 mt-4">
-                                                                    <a class="text-danger delete fw-bold ms-3" style="cursor:pointer;">x</a>
-                                                                </div>
-                                                            </div>
-                                                            @error('week_days.'.$key.'.break_time')
-                                                                    <div class="text-danger  small mt-1 break-error">
-                                                                    {{ $message }}
-                                                                </div>
-                                                            @enderror
+                                                        <x-breake-section
+                                                            :key="$key"
+                                                        />
                                                         @endif
                                                     @endif
 
                                                 </div>
-                                                <div class="col-md-12 smoking-time-container mt-2">
+                                                <div class="col-md-12 smoking-time-container">
                                                     @if ( isset($items_errors[$key]['smoke_break']))
-                                                        @foreach ($items_errors[$key]['smoke_break'] as $i=>$s )
 
-
-                                                            <div class="row g-2 p-2 mt-2 smoking-time-block justify-content-center align-items-center"
-                                                                    style="background: rgba(254, 243, 198, 1); border:1px solid #ffc107;border-radius:8px;">
-                                                                    <div class="col-4">
-                                                                        <button type="button" class="btn btn-sm mb-2" style="background: rgba(254, 243, 198, 1);">
-                                                                            <i class="fa-solid fa-smoking"></i> Ծխելու ժամ
-                                                                        </button>
-                                                                    </div>
-                                                                    <div class="col-3">
-                                                                        <label class="form-label small">Սկիզբ</label>
-                                                                        <input type="time"
-                                                                            class="form-control smoke-start"
-                                                                            name="week_days[{{ $key }}][smoke_break][{{ $i }}][smoke_start_time]"
-                                                                            value="{{ old('week_days.'.$key.'.smoke_break.'. $i .'.smoke_start_time') }}"
-                                                                            >
-                                                                    </div>
-
-                                                                    <div class="col-3">
-                                                                        <label class="form-label small">Ավարտ</label>
-                                                                        <input type="time"
-                                                                                class="form-control smoke-end"
-                                                                                name="week_days[{{ $key }}][smoke_break][{{ $i }}][smoke_end_time]"
-                                                                                value="{{ old('week_days.'.$key.'.smoke_break.'. $i .'.smoke_end_time') }}"
-                                                                            >
-                                                                    </div>
-                                                                    <div class="col-1 mt-4">
-                                                                        <a class="text-danger delete fw-bold ms-3" style="cursor:pointer;">x</a>
-                                                                    </div>
-                                                                </div>
-                                                                @error('week_days.' . $key . '.smoke_break.' . $i)
-                                                                    <div class="text-danger small mt-1 smoke-error">
-                                                                    {{ $message }}
-                                                                </div>
-                                                                @enderror
-                                                        @endforeach
+                                                        <x-smoke-section
+                                                            :key="$key"
+                                                            :smokingDetail="$items_errors[$key]['smoke_break']"
+                                                        />
 
                                                     @endif
 

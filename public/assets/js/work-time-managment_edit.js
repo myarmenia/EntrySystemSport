@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    let sourceDayRow = null; // Օրը, որտեղից պատճենում ենք
+    let sourceDayRow = null; // day from where we copy
     let selectedDays = [];
 
     let lastChangedDayRow = null;
@@ -13,12 +13,10 @@ $(document).ready(function () {
         const end = $row.find(".end-time").val();
         return start !== "" || end !== "";
     }
-    // function isValidTime(value) {
-    // return typeof value === "string" && /^\d{2}:\d{2}$/.test(value);
-// }
+
 
     function collectDayData($row) {
-        alert('collectDayData')
+
         const workStart = $row.find(".start-time").val();
         const workEnd = $row.find(".end-time").val();
 
@@ -56,7 +54,7 @@ $(document).ready(function () {
         if (data.break) {
             const html = `
                 <div class="row g-2 p-2 break-time-block justify-content-center align-items-center"
-                     style="background: rgba(220, 252, 231, 1); border:1px solid #28a745;border-radius:8px;">
+                     style="background: rgba(240, 253, 244, 1); border:2px solid rgba(185, 248, 207, 1);border-radius:8px;">
                     <div class="col-4">
                         <button type="button" class="btn btn-sm mb-2" style="background: rgba(220, 252, 231, 1);">
                             <i class="fa-solid fa-utensils"></i> Ընդմիջման ժամ
@@ -81,24 +79,24 @@ $(document).ready(function () {
         const $smokeContainer = $row.find(".smoking-time-container");
         $smokeContainer.empty();
         $.each(data.smoking, function (i, sm) {
-            alert('Smoking')
+
             const html = `
-            <div class="row g-2 p-2 mt-2 smoking-time-block justify-content-center align-items-center"
-                 style="background: rgba(254, 243, 198, 1); border:1px solid #ffc107;border-radius:8px;">
-                <div class="col-4">
-                    <button type="button" class="btn btn-sm mb-2" style="background: rgba(254, 243, 198, 1);">
-                        <i class="fa-solid fa-smoking"></i> Ծխելու ժամ
+            <div class="row g-2 p-2 d-flex smoking-time-block align-items-center mt-2"
+                 style="background: rgba(255, 251, 235, 1); border:2px solid rgba(254, 230, 133, 1); border-radius:8px">
+                <div class="col-3 d-flex align-items-center py-1">
+                    <button type="button" class="btn btn-sm " >
+                        <i class="fa-solid fa-smoking ms-2"></i> <span class="ms-2 fw-bold">Ծխելու ժամ</span>
                     </button>
                 </div>
-                <div class="col-3">
-                    <label class="form-label small">Սկիզբ</label>
+                <div class="col-4 d-flex flex-column justify-content-center" style="margin: 0 0 18px 0;font-size: 14px">
+                <label class="form-label small">Սկիզբ</label>
                     <input type="time" name="week_days[${$row.data("day")}][smoke_break][${i}][smoke_start_time]" class="form-control smoke-start" value="${sm.start}">
                 </div>
-                <div class="col-3">
-                    <label class="form-label small">Ավարտ</label>
+                <div class="col-4 d-flex flex-column justify-content-center" style="margin: 0 0 18px 0;font-size: 14px">
+                <label class="form-label small">Ավարտ</label>
                     <input type="time" name="week_days[${$row.data("day")}][smoke_break][${i}][smoke_end_time]" class="form-control smoke-end" value="${sm.end}">
                 </div>
-                <div class="col-1 mt-4">
+                <div class="col-1 d-flex align-items-center justify-content-center py-1">
                     <a class="text-danger delete fw-bold ms-3" style="cursor:pointer;">x</a>
                 </div>
             </div>`;
@@ -106,24 +104,6 @@ $(document).ready(function () {
         });
     }
 
-    // function checkFilledDays() {
-    //     console.log("checkFilledDays");
-    //     let filledCount = 0;
-    //     $(".day-row").each(function () {
-    //         if (isDayFilled($(this))) {
-    //             filledCount++;
-    //             console.log(filledCount,'filledCount')
-    //             if (!sourceDayRow) sourceDayRow = $(this);
-    //             console.log(sourceDayRow);
-    //         }
-    //     });
-    //     if (filledCount >= 1) {
-    //         $copyBtn.removeClass("d-none");
-    //     } else {
-    //         $copyBtn.addClass("d-none");
-    //         sourceDayRow = null;
-    //     }
-    // }
     function checkFilledDays() {
         let filledCount = 0;
 
@@ -159,9 +139,6 @@ $(document).ready(function () {
 
     // Input change
     $(document).on("change", ".day-row .start-time, .day-row .end-time", function () {
-        // alert()
-        // checkFilledDays();
-
         const $row = $(this).closest(".day-row");
 
         // եթե տվյալ օրը դեռ ամբողջությամբ լրացված չէ → source չդարձնել
@@ -170,14 +147,11 @@ $(document).ready(function () {
             checkFilledDays();
             return;
         }
-
-        // եթե լրացված է՝ թող նա դառնա source
+        // if fill it will become source
         console.log($row)
         lastChangedDayRow = $row;
-
         sourceDayRow = $row;
         checkFilledDays();
-
     });
 
     // Break button
@@ -187,22 +161,23 @@ $(document).ready(function () {
         const $container = $row.find(".break-time-container");
         if ($container.find(".break-time-block").length) return;
         const html = `
-        <div class="row g-2 p-2 break-time-block justify-content-center align-items-center"
-             style="background: rgba(220, 252, 231, 1); border:1px solid #28a745;border-radius:8px;">
-            <div class="col-4">
-                <button type="button" class="btn btn-sm mb-2" style="background: rgba(220, 252, 231, 1);">
-                    <i class="fa-solid fa-utensils"></i> Ընդմիջման ժամ
+        <div class="row g-2 p-2 d-flex break-time-block align-items-center"
+             style="background: rgba(240, 253, 244, 1); border:2px solid rgba(185, 248, 207, 1);border-radius:8px;">
+            <div class="col-3 d-flex align-items-center py-1">
+                <button type="button" class="btn btn-sm">
+                    <i class="fa-solid fa-utensils"></i>
+                    <span class="ms-2 fw-bold">Ընդմիջման ժամ</span>
                 </button>
             </div>
-            <div class="col-3">
+            <div class="col-4 d-flex flex-column justify-content-center" style="margin: 0 0 18px 0;font-size: 14px">
                 <label class="form-label small">Սկիզբ</label>
                 <input type="time" name="week_days[${key}][break_start_time]" class="form-control break-start">
             </div>
-            <div class="col-3">
+            <div class="col-4 d-flex flex-column justify-content-center" style="margin: 0 0 18px 0;font-size: 14px">
                 <label class="form-label small">Ավարտ</label>
                 <input type="time" name="week_days[${key}][break_end_time]" class="form-control break-end">
             </div>
-            <div class="col-1 mt-4">
+            <div class="col-1 d-flex align-items-center justify-content-center py-1">
                 <a class="text-danger delete fw-bold ms-3" style="cursor:pointer;">x</a>
             </div>
         </div>`;
@@ -212,33 +187,29 @@ $(document).ready(function () {
     // Smoke button
     $(document).on("click", ".smoke-time", function () {
 
-
         const $row = $(this).closest(".day-row");
         const key = $row.data("day");
         const $container = $row.find(".smoking-time-container");
         let smokeCount = $container.find(".smoking-time-block").length;
-        //  smokeCount++;
 
-
-
-    console.log(smokeCount, 'current smokeCount');
         const html = `
-        <div class="row g-2 p-2 mt-2 smoking-time-block justify-content-center align-items-center"
-             style="background: rgba(254, 243, 198, 1); border:1px solid #ffc107;border-radius:8px;">
-            <div class="col-4">
-                <button type="button" class="btn btn-sm mb-2" style="background: rgba(254, 243, 198, 1);">
-                    <i class="fa-solid fa-smoking"></i> Ծխելու ժամ
+        <div class="row g-2 p-2 d-flex smoking-time-block align-items-center mt-2"
+             style="background: rgba(255, 251, 235, 1); border:2px solid rgba(254, 230, 133, 1); border-radius:8px">
+             <div class="col-3 d-flex align-items-center py-1">
+                <button type="button" class="btn btn-sm ">
+                    <i class="fa-solid fa-smoking ms-2 "></i> <span class="ms-2 fw-bold">Ծխելու ժամ</span>
                 </button>
             </div>
-            <div class="col-3">
+
+            <div class="col-4 d-flex flex-column justify-content-center" style="margin: 0 0 18px 0;font-size: 14px">
                 <label class="form-label small">Սկիզբ</label>
                 <input type="time" name="week_days[${key}][smoke_break][${smokeCount}][smoke_start_time]" class="form-control smoke-start">
             </div>
-            <div class="col-3">
+            <div class="col-4 d-flex flex-column justify-content-center" style="margin: 0 0 18px 0;font-size: 14px">
                 <label class="form-label small">Ավարտ</label>
                 <input type="time" name="week_days[${key}][smoke_break][${smokeCount}][smoke_end_time]" class="form-control smoke-end">
             </div>
-            <div class="col-1 mt-4">
+            <div class="col-1 d-flex align-items-center justify-content-center py-1">
                 <a class="text-danger delete fw-bold ms-3" style="cursor:pointer;">x</a>
             </div>
         </div>`;
@@ -274,7 +245,7 @@ $(document).ready(function () {
         console.log(selectedDays);
     });
 
-    // Apply button inside modal (պահանջվում է <button id="applyDays">Տարածել</button> modal-ի մեջ)
+    // Apply button inside modal (required <button id="applyDays">Spread</button>  in modal)
     $(document).on("click", "#applyDays", function () {
 
         if (!sourceDayRow) return;
@@ -292,6 +263,4 @@ $(document).ready(function () {
         $modal.modal("hide");
     });
 
-    // INITIAL CHECK
-    // checkFilledDays();
 });

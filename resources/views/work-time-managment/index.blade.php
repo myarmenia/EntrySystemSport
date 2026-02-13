@@ -24,7 +24,8 @@
                                     </h4>
 
                                     <a href="{{ route('schedule.work-time-create') }}"
-                                            class="btn btn-primary btn-sm ms-auto">
+                                            class="btn btn-primary btn-sm ms-auto" style="background: rgba(0, 166, 62, 1);
+">
                                         <i class="fa fa-plus me-1"></i> Ստեղծել
                                     </a>
                                 </div>
@@ -43,6 +44,7 @@
                                         <thead class="table-light">
                                             <tr>
                                                 <th scope="col" class="py-3 text-start">Անվանում</th>
+                                                <th scope="col" class="py-3 text-center">Աշխատանքային ժամ</th>
                                                 <th scope="col" class="py-3 text-center">Աշխատանքային ժամ</th>
                                                 <th scope="col" class="py-3 text-center">Գործողություն</th>
                                             </tr>
@@ -69,6 +71,7 @@
                                                         <span class="badge text-success me-1" style="opacity: 0.7">{{ $item->schedule_details[0]->day_start_time ?? null }}</span>
                                                         <span class="badge text-danger" style="opacity: 0.7">{{ $item->schedule_details[0]->day_end_time ?? null }}</span>
                                                     </td>
+                                                    <td></td>
 
                                                     <!-- Գործողություններ -->
                                                     <td class="text-center">
